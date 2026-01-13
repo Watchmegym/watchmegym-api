@@ -18,6 +18,7 @@ model User {
   password  String
   active    Boolean  @default(true)
   bioimpedancias Bioimpedance[] @relation("UserBioimpedance")
+  academyUsers AcademyUser[] @relation("UserAcademy")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -54,5 +55,23 @@ model Academy {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  academyUsers AcademyUser[] @relation("AcademyUser")
+
   @@map("academias")
+}
+
+// ==========================================
+// MODELO: ACADEMIAS X USUÁRIOS
+// ==========================================
+
+model AcademyUser {
+  id        String   @id @default(uuid())
+  academyId String
+  academy   Academy @relation("AcademyUser", fields: [academyId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation("UserAcademy", fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("academia_usuarios")
 }

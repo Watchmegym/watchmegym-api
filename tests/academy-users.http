@@ -1,0 +1,111 @@
+### API WatchMeGym - Testes de Vínculos Academia-Usuário
+### Use a extensão REST Client do VS Code para executar estes testes
+
+@baseUrl = http://localhost:3000
+@academyId = COLOQUE_ID_DA_ACADEMIA_AQUI
+@userId = COLOQUE_ID_DO_USUARIO_AQUI
+@linkId = {{createLink.response.body.link.id}}
+
+### 1. Vincular Usuário à Academia
+# @name createLink
+POST {{baseUrl}}/api/academy-users
+Content-Type: application/json
+
+{
+  "academyId": "{{academyId}}",
+  "userId": "{{userId}}"
+}
+
+###
+
+### 2. Listar Todos os Vínculos
+GET {{baseUrl}}/api/academy-users
+
+###
+
+### 3. Buscar Vínculo por ID
+GET {{baseUrl}}/api/academy-users/{{linkId}}
+
+###
+
+### 4. Buscar Usuários de uma Academia
+GET {{baseUrl}}/api/academy-users/academy/{{academyId}}
+
+###
+
+### 5. Buscar Academias de um Usuário
+GET {{baseUrl}}/api/academy-users/user/{{userId}}
+
+###
+
+### 6. Deletar Vínculo por ID
+DELETE {{baseUrl}}/api/academy-users/{{linkId}}
+
+###
+
+### 7. Deletar Vínculo por Academia e Usuário
+DELETE {{baseUrl}}/api/academy-users/academy/{{academyId}}/user/{{userId}}
+
+###
+
+### === Testes de Validação ===
+
+### 8. Vincular - Academia Inválida
+POST {{baseUrl}}/api/academy-users
+Content-Type: application/json
+
+{
+  "academyId": "id-invalido",
+  "userId": "{{userId}}"
+}
+
+###
+
+### 9. Vincular - Usuário Inválido
+POST {{baseUrl}}/api/academy-users
+Content-Type: application/json
+
+{
+  "academyId": "{{academyId}}",
+  "userId": "id-invalido"
+}
+
+###
+
+### 10. Vincular - Academia Inexistente
+POST {{baseUrl}}/api/academy-users
+Content-Type: application/json
+
+{
+  "academyId": "00000000-0000-0000-0000-000000000000",
+  "userId": "{{userId}}"
+}
+
+###
+
+### 11. Vincular - Usuário Inexistente
+POST {{baseUrl}}/api/academy-users
+Content-Type: application/json
+
+{
+  "academyId": "{{academyId}}",
+  "userId": "00000000-0000-0000-0000-000000000000"
+}
+
+###
+
+### 12. Vincular - Vínculo Duplicado
+POST {{baseUrl}}/api/academy-users
+Content-Type: application/json
+
+{
+  "academyId": "{{academyId}}",
+  "userId": "{{userId}}"
+}
+
+###
+
+### 13. Buscar Vínculo - ID Inexistente
+GET {{baseUrl}}/api/academy-users/00000000-0000-0000-0000-000000000000
+
+###
