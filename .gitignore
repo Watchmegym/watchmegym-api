@@ -3,42 +3,102 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 package-lock.json
 yarn.lock
+pnpm-lock.yaml
 
 # Arquivos de ambiente
 .env
+.env.*
+!.env.example
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
+# Prisma
+# Manter migrations versionadas, mas ignorar arquivos de desenvolvimento
+*.db
+*.db-journal
+prisma/.env
+.prisma/
+
 # Logs
 logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
 # Arquivos do sistema operacional
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 desktop.ini
 
 # IDEs e editores
 .vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo
+*.swn
 *~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
 
 # Build
 dist/
 build/
 *.tsbuildinfo
+out/
 
-# Coverage
+# Coverage e Testes
 coverage/
 .nyc_output/
+*.lcov
+.jest/
+
+# Cache
+.npm
+.eslintcache
+.node_repl_history
+.cache/
 
 # Temporários
 tmp/
 temp/
 *.tmp
+*.temp
+*.bak
+*.old
+
+# Uploads (se houver)
+uploads/
+public/uploads/
+
+# Debug
+.pnpm-debug.log
+
+# OS generated files
+*.pid
+*.seed
+*.pid.lock
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
