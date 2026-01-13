@@ -56,6 +56,7 @@ model Academy {
   updatedAt DateTime @updatedAt
 
   academyUsers AcademyUser[] @relation("AcademyUser")
+  cameras Camera[] @relation("AcademyCamera")
 
   @@map("academias")
 }
@@ -74,4 +75,41 @@ model AcademyUser {
   updatedAt DateTime @updatedAt
 
   @@map("academia_usuarios")
+}
+
+// ==========================================
+// MODELO: CAMERAS
+// ==========================================
+
+model Camera {
+  id        String   @id @default(uuid())
+  academyId String
+  academy   Academy @relation("AcademyCamera", fields: [academyId], references: [id], onDelete: Restrict) 
+  exerciseId String?
+  exercise   Exercise? @relation("ExerciseCamera", fields: [exerciseId], references: [id], onDelete: SetNull)
+  name      String
+  description String
+  url       String
+  streamUrl String
+  enabled     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("cameras")
+}
+
+// ==========================================
+// MODELO: Exercícios
+// ==========================================
+
+model Exercise {
+  id        String   @id @default(uuid())
+  name      String
+  description String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cameras Camera[] @relation("ExerciseCamera")
+
+  @@map("exercicios")
 }

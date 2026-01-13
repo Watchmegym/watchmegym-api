@@ -1,0 +1,183 @@
+### API WatchMeGym - Testes de Câmeras
+### Use a extensão REST Client do VS Code para executar estes testes
+
+@baseUrl = http://localhost:3000
+@academyId = 4539d54e-1065-481f-b0a6-90decbc0b565
+@exerciseId = ecdbb226-09af-4667-8581-b023e9375c01
+@cameraId = {{createCamera.response.body.camera.id}}
+
+### 1. Criar Câmera (sem exercício)
+# @name createCamera
+POST {{baseUrl}}/api/cameras
+Content-Type: application/json
+
+{
+  "academyId": "{{academyId}}",
+  "name": "Câmera Sala Musculação",
+  "description": "Câmera principal da sala de musculação",
+  "url": "https://camera.academia.com/sala-musculacao",
+  "streamUrl": "rtsp://camera.academia.com:554/stream/musculacao",
+  "enabled": true,
+  "exerciseId": "{{exerciseId}}"
+}
+
+###
+
+### 1.1. Criar Câmera (com exercício)
+POST {{baseUrl}}/api/cameras
+Content-Type: application/json
+
+{
+  "academyId": "{{academyId}}",
+  "exerciseId": "{{exerciseId}}",
+  "name": "Câmera Supino Reto",
+  "description": "Câmera para monitorar execução do supino reto",
+  "url": "https://camera.academia.com/supino",
+  "streamUrl": "rtsp://camera.academia.com:554/stream/supino",
+  "enabled": true
+}
+
+###
+
+### 2. Listar Todas as Câmeras
+GET {{baseUrl}}/api/cameras
+
+###
+
+### 3. Buscar Câmera por ID
+GET {{baseUrl}}/api/cameras/{{cameraId}}
+
+###
+
+### 4. Buscar Câmeras por Academia
+GET {{baseUrl}}/api/cameras/academy/{{academyId}}
+
+###
+
+### 5. Buscar Câmeras Ativas por Academia
+GET {{baseUrl}}/api/cameras/academy/{{academyId}}/enabled
+
+###
+
+### 6. Buscar Câmeras por Nome
+GET {{baseUrl}}/api/cameras/search?name=Musculação
+
+###
+
+### 6.1. Buscar Câmeras por Exercício
+GET {{baseUrl}}/api/cameras/exercise/{{exerciseId}}
+
+###
+
+### 7. Atualizar Câmera
+PUT {{baseUrl}}/api/cameras/{{cameraId}}
+Content-Type: application/json
+
+{
+  "name": "Câmera Sala Musculação - Principal",
+  "description": "Câmera principal da sala de musculação - HD"
+}
+
+###
+
+### 8. Habilitar/Desabilitar Câmera
+PATCH {{baseUrl}}/api/cameras/{{cameraId}}/toggle
+Content-Type: application/json
+
+{
+  "enabled": false
+}
+
+###
+
+### 9. Deletar Câmera
+DELETE {{baseUrl}}/api/cameras/{{cameraId}}
+
+###
+
+### === Testes de Validação ===
+
+### 10. Criar Câmera - Academia Inválida
+POST {{baseUrl}}/api/cameras
+Content-Type: application/json
+
+{
+  "academyId": "id-invalido",
+  "name": "Câmera Teste",
+  "description": "Teste de validação",
+  "url": "https://test.com",
+  "streamUrl": "rtsp://test.com:554/stream"
+}
+
+###
+
+### 11. Criar Câmera - Nome Muito Curto
+POST {{baseUrl}}/api/cameras
+Content-Type: application/json
+
+{
+  "academyId": "{{academyId}}",
+  "name": "Ca",
+  "description": "Teste de validação",
+  "url": "https://test.com",
+  "streamUrl": "rtsp://test.com:554/stream"
+}
+
+###
+
+### 12. Criar Câmera - URL Inválida
+POST {{baseUrl}}/api/cameras
+Content-Type: application/json
+
+{
+  "academyId": "{{academyId}}",
+  "name": "Câmera Teste",
+  "description": "Teste de validação",
+  "url": "url-invalida",
+  "streamUrl": "rtsp://test.com:554/stream"
+}
+
+###
+
+### 13. Criar Câmera - Stream URL Inválida
+POST {{baseUrl}}/api/cameras
+Content-Type: application/json
+
+{
+  "academyId": "{{academyId}}",
+  "name": "Câmera Teste",
+  "description": "Teste de validação",
+  "url": "https://test.com",
+  "streamUrl": "stream-invalido"
+}
+
+###
+
+### 14. Criar Câmera - Academia Inexistente
+POST {{baseUrl}}/api/cameras
+Content-Type: application/json
+
+{
+  "academyId": "00000000-0000-0000-0000-000000000000",
+  "name": "Câmera Teste",
+  "description": "Teste de validação",
+  "url": "https://test.com",
+  "streamUrl": "rtsp://test.com:554/stream"
+}
+
+###
+
+### 15. Buscar Câmera - ID Inexistente
+GET {{baseUrl}}/api/cameras/00000000-0000-0000-0000-000000000000
+
+###
+
+### 16. Toggle Câmera - Valor Inválido
+PATCH {{baseUrl}}/api/cameras/{{cameraId}}/toggle
+Content-Type: application/json
+
+{
+  "enabled": "sim"
+}
+
+###

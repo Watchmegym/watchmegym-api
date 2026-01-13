@@ -1,0 +1,151 @@
+### API WatchMeGym - Testes de Exercícios
+### Use a extensão REST Client do VS Code para executar estes testes
+
+@baseUrl = http://localhost:3000
+@exerciseId = {{createExercise.response.body.exercise.id}}
+
+### 1. Criar Exercício
+# @name createExercise
+POST {{baseUrl}}/api/exercises
+Content-Type: application/json
+
+{
+  "name": "Supino Reto",
+  "description": "Exercício para desenvolvimento dos músculos peitorais, realizado deitado em um banco horizontal com a barra sendo empurrada verticalmente."
+}
+
+###
+
+### 2. Listar Todos os Exercícios
+GET {{baseUrl}}/api/exercises
+
+###
+
+### 3. Buscar Exercício por ID
+GET {{baseUrl}}/api/exercises/{{exerciseId}}
+
+###
+
+### 4. Buscar Exercícios por Nome
+GET {{baseUrl}}/api/exercises/search?name=Supino
+
+###
+
+### 5. Atualizar Exercício
+PUT {{baseUrl}}/api/exercises/{{exerciseId}}
+Content-Type: application/json
+
+{
+  "name": "Supino Reto com Barra",
+  "description": "Exercício composto para desenvolvimento dos músculos peitorais, tríceps e deltoides anteriores, realizado deitado em um banco horizontal."
+}
+
+###
+
+### 6. Deletar Exercício
+DELETE {{baseUrl}}/api/exercises/{{exerciseId}}
+
+###
+
+### === Testes Adicionais ===
+
+### 7. Criar Vários Exercícios
+POST {{baseUrl}}/api/exercises
+Content-Type: application/json
+
+{
+  "name": "Agachamento Livre",
+  "description": "Exercício composto para membros inferiores, especialmente quadríceps, glúteos e isquiotibiais."
+}
+
+###
+
+POST {{baseUrl}}/api/exercises
+Content-Type: application/json
+
+{
+  "name": "Levantamento Terra",
+  "description": "Exercício composto que trabalha praticamente todos os grupos musculares do corpo, com ênfase em posteriores de coxa, glúteos e lombar."
+}
+
+###
+
+POST {{baseUrl}}/api/exercises
+Content-Type: application/json
+
+{
+  "name": "Rosca Direta",
+  "description": "Exercício de isolamento para desenvolvimento dos músculos bíceps braquial."
+}
+
+###
+
+POST {{baseUrl}}/api/exercises
+Content-Type: application/json
+
+{
+  "name": "Desenvolvimento com Halteres",
+  "description": "Exercício para desenvolvimento dos deltoides (ombros), realizado sentado ou em pé."
+}
+
+###
+
+### === Testes de Validação ===
+
+### 8. Criar Exercício - Nome Muito Curto
+POST {{baseUrl}}/api/exercises
+Content-Type: application/json
+
+{
+  "name": "Ab",
+  "description": "Descrição do exercício de abdominais"
+}
+
+###
+
+### 9. Criar Exercício - Descrição Muito Curta
+POST {{baseUrl}}/api/exercises
+Content-Type: application/json
+
+{
+  "name": "Abdominal",
+  "description": "Abs"
+}
+
+###
+
+### 10. Criar Exercício - Nome Duplicado
+POST {{baseUrl}}/api/exercises
+Content-Type: application/json
+
+{
+  "name": "Supino Reto",
+  "description": "Outro exercício de supino reto"
+}
+
+###
+
+### 11. Atualizar Exercício - Nome Duplicado
+PUT {{baseUrl}}/api/exercises/{{exerciseId}}
+Content-Type: application/json
+
+{
+  "name": "Agachamento Livre"
+}
+
+###
+
+### 12. Buscar Exercício - ID Inexistente
+GET {{baseUrl}}/api/exercises/00000000-0000-0000-0000-000000000000
+
+###
+
+### 13. Deletar Exercício - ID Inexistente
+DELETE {{baseUrl}}/api/exercises/00000000-0000-0000-0000-000000000000
+
+###
+
+### 14. Buscar Exercícios - Parâmetro "name" Ausente
+GET {{baseUrl}}/api/exercises/search
+
+###
