@@ -22,6 +22,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  statisticsCameraUsers StatisticsCameraUserExercise[] @relation("StatisticsCameraUserExercise")
+
   @@map("usuarios")
 }
 
@@ -95,6 +97,8 @@ model Camera {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  statisticsCameraUsers StatisticsCameraUserExercise[] @relation("StatisticsCameraUserExercise")
+
   @@map("cameras")
 }
 
@@ -112,4 +116,22 @@ model Exercise {
   cameras Camera[] @relation("ExerciseCamera")
 
   @@map("exercicios")
+}
+
+// ==========================================
+// MODELO: Estatísticas X Câmeras X Usuários
+// ==========================================
+
+model StatisticsCameraUserExercise {
+  id        String   @id @default(uuid())
+  cameraId String
+  camera   Camera @relation("StatisticsCameraUserExercise", fields: [cameraId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation("StatisticsCameraUserExercise", fields: [userId], references: [id], onDelete: Cascade)
+  quantityRepetitions Int
+  quantitySets Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("estatisticas_usuarios_cameras")
 }

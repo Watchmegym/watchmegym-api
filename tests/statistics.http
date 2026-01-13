@@ -1,0 +1,214 @@
+### API WatchMeGym - Testes de Estatísticas
+### Use a extensão REST Client do VS Code para executar estes testes
+
+@baseUrl = http://localhost:3000
+@userId = 8c7e355a-41b8-4373-83cf-6b43ba26c884
+@cameraId = 5d6afd2d-1003-40c5-8354-634370dd29ad
+@statisticsId = {{createStatistics.response.body.statistics.id}}
+
+### 1. Criar Estatística
+# @name createStatistics
+POST {{baseUrl}}/api/statistics
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "quantityRepetitions": 12,
+  "quantitySets": 3
+}
+
+###
+
+### 2. Listar Todas as Estatísticas
+GET {{baseUrl}}/api/statistics
+
+###
+
+### 3. Buscar Estatística por ID
+GET {{baseUrl}}/api/statistics/{{statisticsId}}
+
+###
+
+### 4. Buscar Estatísticas por Usuário
+GET {{baseUrl}}/api/statistics/user/{{userId}}
+
+###
+
+### 5. Buscar Estatísticas por Câmera
+GET {{baseUrl}}/api/statistics/camera/{{cameraId}}
+
+###
+
+### 6. Buscar Estatísticas por Exercício
+GET {{baseUrl}}/api/statistics/exercise/{{exerciseId}}
+
+###
+
+### 7. Buscar Estatísticas por Usuário e Câmera
+GET {{baseUrl}}/api/statistics/user/{{userId}}/camera/{{cameraId}}
+
+###
+
+### 8. Buscar Estatísticas Agregadas por Usuário
+GET {{baseUrl}}/api/statistics/user/{{userId}}/aggregated
+
+###
+
+### 9. Buscar Estatísticas Agregadas por Câmera
+GET {{baseUrl}}/api/statistics/camera/{{cameraId}}/aggregated
+
+###
+
+### 10. Atualizar Estatística
+PUT {{baseUrl}}/api/statistics/{{statisticsId}}
+Content-Type: application/json
+
+{
+  "quantityRepetitions": 15,
+  "quantitySets": 4
+}
+
+###
+
+### 11. Deletar Estatística
+DELETE {{baseUrl}}/api/statistics/{{statisticsId}}
+
+###
+
+### === Testes Adicionais ===
+
+### 12. Criar Múltiplas Estatísticas
+POST {{baseUrl}}/api/statistics
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "quantityRepetitions": 10,
+  "quantitySets": 3
+}
+
+###
+
+POST {{baseUrl}}/api/statistics
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "quantityRepetitions": 8,
+  "quantitySets": 4
+}
+
+###
+
+POST {{baseUrl}}/api/statistics
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "quantityRepetitions": 12,
+  "quantitySets": 3
+}
+
+###
+
+### === Testes de Validação ===
+
+### 13. Criar Estatística - Câmera Inválida
+POST {{baseUrl}}/api/statistics
+Content-Type: application/json
+
+{
+  "cameraId": "id-invalido",
+  "userId": "{{userId}}",
+  "quantityRepetitions": 12,
+  "quantitySets": 3
+}
+
+###
+
+### 14. Criar Estatística - Usuário Inválido
+POST {{baseUrl}}/api/statistics
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "id-invalido",
+  "quantityRepetitions": 12,
+  "quantitySets": 3
+}
+
+###
+
+### 15. Criar Estatística - Repetições Negativas
+POST {{baseUrl}}/api/statistics
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "quantityRepetitions": -5,
+  "quantitySets": 3
+}
+
+###
+
+### 16. Criar Estatística - Séries Zero
+POST {{baseUrl}}/api/statistics
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "quantityRepetitions": 12,
+  "quantitySets": 0
+}
+
+###
+
+### 17. Criar Estatística - Repetições Muito Altas
+POST {{baseUrl}}/api/statistics
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "quantityRepetitions": 1500,
+  "quantitySets": 3
+}
+
+###
+
+### 18. Criar Estatística - Câmera Inexistente
+POST {{baseUrl}}/api/statistics
+Content-Type: application/json
+
+{
+  "cameraId": "00000000-0000-0000-0000-000000000000",
+  "userId": "{{userId}}",
+  "quantityRepetitions": 12,
+  "quantitySets": 3
+}
+
+###
+
+### 19. Criar Estatística - Usuário Inexistente
+POST {{baseUrl}}/api/statistics
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "00000000-0000-0000-0000-000000000000",
+  "quantityRepetitions": 12,
+  "quantitySets": 3
+}
+
+###
+
+### 20. Buscar Estatística - ID Inexistente
+GET {{baseUrl}}/api/statistics/00000000-0000-0000-0000-000000000000
+
+###
