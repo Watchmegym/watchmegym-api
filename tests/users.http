@@ -1,0 +1,105 @@
+### API WatchMeGym - Testes de Usuários
+### Use a extensão REST Client do VS Code para executar estes testes
+### ou copie para Postman/Insomnia
+
+@baseUrl = http://localhost:3000
+@userId = {{createUser.response.body.user.id}}
+
+### 1. Health Check
+GET {{baseUrl}}/api/health
+
+###
+
+### 2. Criar Usuário
+# @name createUser
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "email": "teste@email.com",
+  "name": "João da Silva",
+  "password": "senha123"
+}
+
+###
+
+### 3. Listar Todos os Usuários
+GET {{baseUrl}}/api/users
+
+###
+
+### 4. Buscar Usuário por ID (use o ID do usuário criado)
+GET {{baseUrl}}/api/users/{{userId}}
+
+###
+
+### 5. Atualizar Usuário
+PUT {{baseUrl}}/api/users/{{userId}}
+Content-Type: application/json
+
+{
+  "name": "João da Silva Santos",
+  "email": "joao.silva@email.com"
+}
+
+###
+
+### 6. Deletar Usuário (soft delete)
+DELETE {{baseUrl}}/api/users/{{userId}}
+
+###
+
+### === Testes de Validação ===
+
+### 7. Criar Usuário - Email Inválido
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "email": "email-invalido",
+  "name": "Teste",
+  "password": "senha123"
+}
+
+###
+
+### 8. Criar Usuário - Nome Muito Curto
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "email": "teste2@email.com",
+  "name": "ab",
+  "password": "senha123"
+}
+
+###
+
+### 9. Criar Usuário - Senha Muito Curta
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "email": "teste3@email.com",
+  "name": "Teste Três",
+  "password": "123"
+}
+
+###
+
+### 10. Criar Usuário - Email Duplicado
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "email": "teste@email.com",
+  "name": "Outro Nome",
+  "password": "senha123"
+}
+
+###
+
+### 11. Buscar Usuário - ID Inexistente
+GET {{baseUrl}}/api/users/00000000-0000-0000-0000-000000000000
+
+###
