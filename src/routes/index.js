@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const userRoutes = require('./user.routes');
 
 // Rota básica
 router.get('/', (req, res) => {
@@ -16,5 +17,8 @@ router.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+
+// Rotas de usuários
+router.use('/api/users', userRoutes);
 
 module.exports = router;
