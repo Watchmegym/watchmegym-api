@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userRoutes = require('./user.routes');
 const bioimpedanceRoutes = require('./bioimpedance.routes');
+const academyRoutes = require('./academy.routes');
 
 // Rota básica
 router.get('/', (req, res) => {
@@ -24,5 +25,8 @@ router.use('/api/users', userRoutes);
 
 // Rotas de bioimpedâncias
 router.use('/api/bioimpedances', bioimpedanceRoutes);
+
+// Rotas de academias
+router.use('/api/academies', academyRoutes);
 
 module.exports = router;

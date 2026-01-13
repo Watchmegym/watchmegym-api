@@ -8,6 +8,9 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// ==========================================
+// MODELO: USUÁRIOS
+// ==========================================
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -21,6 +24,9 @@ model User {
   @@map("usuarios")
 }
 
+// ==========================================
+// MODELO: BIOIMPEDANCIAS
+// ==========================================
 model Bioimpedance {
   id        String   @id @default(uuid())
   userId    String
@@ -33,4 +39,20 @@ model Bioimpedance {
   updatedAt DateTime @updatedAt
 
   @@map("bioimpedancias")
+}
+
+// ==========================================
+// MODELO: ACADEMIAS
+// ==========================================
+
+model Academy {
+  id        String   @id @default(uuid())
+  name      String
+  address   String
+  phone     String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("academias")
 }

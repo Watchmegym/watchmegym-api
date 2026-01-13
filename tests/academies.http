@@ -1,0 +1,127 @@
+### API WatchMeGym - Testes de Academias
+### Use a extensão REST Client do VS Code para executar estes testes
+
+@baseUrl = http://localhost:3000
+@academyId = {{createAcademy.response.body.academy.id}}
+
+### 1. Criar Academia
+# @name createAcademy
+POST {{baseUrl}}/api/academies
+Content-Type: application/json
+
+{
+  "name": "Academia Fitness Pro",
+  "address": "Rua das Flores, 123 - Centro",
+  "phone": "11987654321",
+  "email": "contato@fitnesspro.com"
+}
+
+###
+
+### 2. Listar Todas as Academias
+GET {{baseUrl}}/api/academies
+
+###
+
+### 3. Buscar Academia por ID
+GET {{baseUrl}}/api/academies/{{academyId}}
+
+###
+
+### 4. Buscar Academia por Nome
+# O parâmetro de busca "name" fornecido em uma query string pode potencialmente ser uma fonte de SQL Injection,
+# SE a API implementasse a query via string interpolation em SQL bruto, sem sanitização ou uso de ORM.
+# No entanto, caso esteja usando Prisma (como no contexto desse projeto), as queries de busca são parametrizadas,
+# então PRISMA previne SQL Injection. Logo, esse endpoint NÃO tem perigo de SQL Injection se a implementação está usando Prisma corretamente.
+
+GET {{baseUrl}}/api/academies/search?name=Fitness
+
+###
+
+### 5. Atualizar Academia
+PUT {{baseUrl}}/api/academies/{{academyId}}
+Content-Type: application/json
+
+{
+  "name": "Academia Fitness Pro Premium",
+  "phone": "11987654322"
+}
+
+###
+
+### 6. Deletar Academia
+DELETE {{baseUrl}}/api/academies/{{academyId}}
+
+###
+
+### === Testes de Validação ===
+
+### 7. Criar Academia - Email Inválido
+POST {{baseUrl}}/api/academies
+Content-Type: application/json
+
+{
+  "name": "Academia Teste",
+  "address": "Rua Teste, 456",
+  "phone": "11987654321",
+  "email": "email-invalido"
+}
+
+###
+
+### 8. Criar Academia - Nome Muito Curto
+POST {{baseUrl}}/api/academies
+Content-Type: application/json
+
+{
+  "name": "Ac",
+  "address": "Rua Teste, 456",
+  "phone": "11987654321",
+  "email": "teste@email.com"
+}
+
+###
+
+### 9. Criar Academia - Telefone Muito Curto
+POST {{baseUrl}}/api/academies
+Content-Type: application/json
+
+{
+  "name": "Academia Teste",
+  "address": "Rua Teste, 456",
+  "phone": "123",
+  "email": "teste2@email.com"
+}
+
+###
+
+### 10. Criar Academia - Endereço Muito Curto
+POST {{baseUrl}}/api/academies
+Content-Type: application/json
+
+{
+  "name": "Academia Teste",
+  "address": "Rua",
+  "phone": "11987654321",
+  "email": "teste3@email.com"
+}
+
+###
+
+### 11. Criar Academia - Email Duplicado
+POST {{baseUrl}}/api/academies
+Content-Type: application/json
+
+{
+  "name": "Academia Outra",
+  "address": "Rua Outra, 789",
+  "phone": "11987654323",
+  "email": "contato@fitnesspro.com"
+}
+
+###
+
+### 12. Buscar Academia - ID Inexistente
+GET {{baseUrl}}/api/academies/00000000-0000-0000-0000-000000000000
+
+###
