@@ -39,16 +39,6 @@ GET {{baseUrl}}/api/records/camera/{{cameraId}}
 
 ###
 
-### 6. Buscar Gravações por Academia
-GET {{baseUrl}}/api/records/academy/{{academyId}}
-
-###
-
-### 7. Buscar Gravações por Exercício
-GET {{baseUrl}}/api/records/exercise/{{exerciseId}}
-
-###
-
 ### 8. Buscar Gravações por Usuário e Câmera
 GET {{baseUrl}}/api/records/user/{{userId}}/camera/{{cameraId}}
 
