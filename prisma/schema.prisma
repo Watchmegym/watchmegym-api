@@ -14,8 +14,23 @@ model User {
   name      String
   password  String
   active    Boolean  @default(true)
+  bioimpedancias Bioimpedance[] @relation("UserBioimpedance")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("usuarios")
+}
+
+model Bioimpedance {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation("UserBioimpedance", fields: [userId], references: [id], onDelete: Restrict) 
+  weight    Float
+  height    Float
+  bmi       Float
+  bmr       Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("bioimpedancias")
 }

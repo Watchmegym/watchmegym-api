@@ -1,0 +1,120 @@
+### API WatchMeGym - Testes de Bioimpedâncias
+### Use a extensão REST Client do VS Code para executar estes testes
+
+@baseUrl = http://localhost:3000
+@userId = 8c7e355a-41b8-4373-83cf-6b43ba26c884
+@bioimpedanceId = {{createBioimpedance.response.body.bioimpedance.id}}
+
+### 1. Criar Bioimpedância
+# @name createBioimpedance
+POST {{baseUrl}}/api/bioimpedances
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "weight": 75.5,
+  "height": 1.75,
+  "bmi": 24.65,
+  "bmr": 1650.5
+}
+
+###
+
+### 2. Listar Todas as Bioimpedâncias
+GET {{baseUrl}}/api/bioimpedances
+
+###
+
+### 3. Buscar Bioimpedância por ID
+GET {{baseUrl}}/api/bioimpedances/{{bioimpedanceId}}
+
+###
+
+### 4. Buscar Bioimpedâncias por Usuário
+GET {{baseUrl}}/api/bioimpedances/user/{{userId}}
+
+###
+
+### 5. Buscar Última Bioimpedância do Usuário
+GET {{baseUrl}}/api/bioimpedances/user/{{userId}}/latest
+
+###
+
+### 6. Atualizar Bioimpedância
+PUT {{baseUrl}}/api/bioimpedances/{{bioimpedanceId}}
+Content-Type: application/json
+
+{
+  "weight": 76.0,
+  "bmi": 24.82
+}
+
+###
+
+### 7. Deletar Bioimpedância
+DELETE {{baseUrl}}/api/bioimpedances/{{bioimpedanceId}}
+
+###
+
+### === Testes de Validação ===
+
+### 8. Criar Bioimpedância - Usuário Inválido
+POST {{baseUrl}}/api/bioimpedances
+Content-Type: application/json
+
+{
+  "userId": "id-invalido",
+  "weight": 75.5,
+  "height": 1.75,
+  "bmi": 24.65,
+  "bmr": 1650.5
+}
+
+###
+
+### 9. Criar Bioimpedância - Peso Negativo
+POST {{baseUrl}}/api/bioimpedances
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "weight": -75.5,
+  "height": 1.75,
+  "bmi": 24.65,
+  "bmr": 1650.5
+}
+
+###
+
+### 10. Criar Bioimpedância - Altura Muito Alta
+POST {{baseUrl}}/api/bioimpedances
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "weight": 75.5,
+  "height": 5.0,
+  "bmi": 24.65,
+  "bmr": 1650.5
+}
+
+###
+
+### 11. Criar Bioimpedância - Usuário Inexistente
+POST {{baseUrl}}/api/bioimpedances
+Content-Type: application/json
+
+{
+  "userId": "00000000-0000-0000-0000-000000000000",
+  "weight": 75.5,
+  "height": 1.75,
+  "bmi": 24.65,
+  "bmr": 1650.5
+}
+
+###
+
+### 12. Buscar Bioimpedância - ID Inexistente
+GET {{baseUrl}}/api/bioimpedances/00000000-0000-0000-0000-000000000000
+
+###
