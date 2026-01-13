@@ -8,6 +8,7 @@ const cameraRoutes = require('./camera.routes');
 const exerciseRoutes = require('./exercise.routes');
 const statisticsCameraUserRoutes = require('./statisticsCameraUser.routes');
 const recordRoutes = require('./record.routes');
+const recordingRoutes = require('./recording.routes');
 
 // Rota básica
 router.get('/', (req, res) => {
@@ -46,7 +47,10 @@ router.use('/api/exercises', exerciseRoutes);
 // Rotas de estatísticas
 router.use('/api/statistics', statisticsCameraUserRoutes);
 
-// Rotas de gravações
+// Rotas de gravações (CRUD)
 router.use('/api/records', recordRoutes);
+
+// Rotas de gravação RTSP (Funcionalidade de captura)
+router.use('/api/recordings', recordingRoutes);
 
 module.exports = router;

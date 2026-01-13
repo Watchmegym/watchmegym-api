@@ -1,0 +1,205 @@
+### API WatchMeGym - Testes de Gravação de Streams
+### Use a extensão REST Client do VS Code para executar estes testes
+
+@baseUrl = http://localhost:3000
+@userId = 8c7e355a-41b8-4373-83cf-6b43ba26c884
+@cameraId = 5d6afd2d-1003-40c5-8354-634370dd29ad
+
+### === TESTE COM CÂMERA HTTP/MJPEG ===
+
+### 1. Iniciar Gravação - HTTP/MJPEG Stream (10 segundos)
+# Stream público de exemplo
+POST {{baseUrl}}/api/recordings/start
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "duration": 10
+}
+
+###
+
+### 2. Iniciar Gravação - RTSP Stream (10 segundos)
+POST {{baseUrl}}/api/recordings/start
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "duration": 10
+}
+
+###
+
+### === TESTES DE MÚLTIPLAS GRAVAÇÕES ===
+
+### 3. Iniciar Múltiplas Gravações (5 segundos cada)
+POST {{baseUrl}}/api/recordings/start-multiple
+Content-Type: application/json
+
+{
+  "recordings": [
+    { "cameraId": "{{cameraId}}", "userId": "{{userId}}", "duration": 5 },
+    { "cameraId": "{{cameraId}}", "userId": "{{userId}}", "duration": 5 }
+  ]
+}
+
+###
+
+### === TESTES DE VALIDAÇÃO ===
+
+### 4. Erro - Câmera Inválida (UUID malformado)
+POST {{baseUrl}}/api/recordings/start
+Content-Type: application/json
+
+{
+  "cameraId": "id-invalido",
+  "userId": "{{userId}}",
+  "duration": 10
+}
+
+###
+
+### 5. Erro - Usuário Inválido (UUID malformado)
+POST {{baseUrl}}/api/recordings/start
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "id-invalido",
+  "duration": 10
+}
+
+###
+
+### 6. Erro - Duração Zero
+POST {{baseUrl}}/api/recordings/start
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "duration": 0
+}
+
+###
+
+### 7. Erro - Duração Excedida (301 segundos)
+POST {{baseUrl}}/api/recordings/start
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "duration": 301
+}
+
+###
+
+### 8. Erro - Câmera Não Encontrada
+POST {{baseUrl}}/api/recordings/start
+Content-Type: application/json
+
+{
+  "cameraId": "00000000-0000-0000-0000-000000000000",
+  "userId": "{{userId}}",
+  "duration": 10
+}
+
+###
+
+### 9. Erro - Usuário Não Encontrado
+POST {{baseUrl}}/api/recordings/start
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "00000000-0000-0000-0000-000000000000",
+  "duration": 10
+}
+
+###
+
+### === EXEMPLOS DE URLS DE STREAMS ===
+
+### Exemplo 1: HTTP/MJPEG Stream Público
+# URL: http://61.211.241.239/nphMotionJpeg?Resolution=320x240&Quality=Standard
+# Tipo: Motion JPEG
+# Usar esta URL no campo streamUrl da câmera
+
+### Exemplo 2: RTSP Stream (Hikvision)
+# URL: rtsp://admin:senha@192.168.1.64:554/Streaming/Channels/101
+# Tipo: RTSP H.264
+# Substituir admin:senha pelos valores reais
+
+### Exemplo 3: RTSP Stream (Dahua/Intelbras)
+# URL: rtsp://admin:senha@192.168.1.108:554/cam/realmonitor?channel=1&subtype=0
+# Tipo: RTSP H.264
+# Substituir admin:senha pelos valores reais
+
+### Exemplo 4: HTTP Stream
+# URL: http://192.168.1.100:8080/video
+# Tipo: HTTP Video Stream
+
+###
+
+### === CRIAR CÂMERA DE TESTE ===
+
+### 10. Criar Câmera com HTTP/MJPEG Stream
+POST {{baseUrl}}/api/cameras
+Content-Type: application/json
+
+{
+  "academyId": "sua-academy-id-aqui",
+  "name": "Câmera Teste HTTP",
+  "description": "Câmera pública de teste - Motion JPEG",
+  "url": "http://61.211.241.239",
+  "streamUrl": "http://61.211.241.239/nphMotionJpeg?Resolution=320x240&Quality=Standard",
+  "enabled": true
+}
+
+###
+
+### 11. Criar Câmera com RTSP Stream
+POST {{baseUrl}}/api/cameras
+Content-Type: application/json
+
+{
+  "academyId": "sua-academy-id-aqui",
+  "name": "Câmera RTSP Local",
+  "description": "Câmera IP interna",
+  "url": "http://192.168.1.100",
+  "streamUrl": "rtsp://admin:senha@192.168.1.100:554/stream1",
+  "enabled": true
+}
+
+###
+
+### === VERIFICAR GRAVAÇÕES ===
+
+### 12. Listar Todas as Gravações
+GET {{baseUrl}}/api/records
+
+###
+
+### 13. Buscar Gravações por Câmera
+GET {{baseUrl}}/api/records?cameraId={{cameraId}}
+
+###
+
+### 14. Buscar Gravações por Usuário
+GET {{baseUrl}}/api/records?userId={{userId}}
+
+###
+
+### === NOTAS ===
+
+# 1. Substitua {{cameraId}} e {{userId}} pelos IDs reais do seu banco
+# 2. Para testar com a câmera HTTP/MJPEG, use a URL:
+#    http://61.211.241.239/nphMotionJpeg?Resolution=320x240&Quality=Standard
+# 3. Configure Supabase Storage para salvar gravações em produção
+# 4. Em desenvolvimento, gravações são salvas em public/recordings/
+# 5. O FFmpeg agora detecta automaticamente o tipo de stream (RTSP, HTTP, MJPEG)
+
+###
