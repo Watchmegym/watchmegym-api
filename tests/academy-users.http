@@ -2,8 +2,8 @@
 ### Use a extensão REST Client do VS Code para executar estes testes
 
 @baseUrl = http://localhost:3000
-@academyId = COLOQUE_ID_DA_ACADEMIA_AQUI
-@userId = COLOQUE_ID_DO_USUARIO_AQUI
+@academyId = 4539d54e-1065-481f-b0a6-90decbc0b565
+@userId = 8c7e355a-41b8-4373-83cf-6b43ba26c884
 @linkId = {{createLink.response.body.link.id}}
 
 ### 1. Vincular Usuário à Academia
