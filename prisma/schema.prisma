@@ -23,6 +23,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   statisticsCameraUsers StatisticsCameraUserExercise[] @relation("StatisticsCameraUserExercise")
+  records Record[] @relation("RecordUser")
 
   @@map("usuarios")
 }
@@ -98,7 +99,7 @@ model Camera {
   updatedAt DateTime @updatedAt
 
   statisticsCameraUsers StatisticsCameraUserExercise[] @relation("StatisticsCameraUserExercise")
-
+  records Record[] @relation("RecordCamera")
   @@map("cameras")
 }
 
@@ -134,4 +135,21 @@ model StatisticsCameraUserExercise {
   updatedAt DateTime @updatedAt
 
   @@map("estatisticas_usuarios_cameras")
+}
+
+// ==========================================
+// MODELO: Gravações
+// ==========================================
+
+model Record {
+  id        String   @id @default(uuid())
+  cameraId String
+  camera   Camera @relation("RecordCamera", fields: [cameraId], references: [id], onDelete: Restrict)
+  userId    String
+  user      User     @relation("RecordUser", fields: [userId], references: [id], onDelete: Restrict)
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("gravacoes")
 }

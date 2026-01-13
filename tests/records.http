@@ -1,0 +1,193 @@
+### API WatchMeGym - Testes de Gravações
+### Use a extensão REST Client do VS Code para executar estes testes
+
+@baseUrl = http://localhost:3000
+@userId = 8c7e355a-41b8-4373-83cf-6b43ba26c884
+@cameraId = 5d6afd2d-1003-40c5-8354-634370dd29ad
+@recordId = {{createRecord.response.body.record.id}}
+
+### 1. Criar Gravação
+# @name createRecord
+POST {{baseUrl}}/api/records
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "url": "https://storage.watchmegym.com/recordings/2024/01/user-123-camera-456.mp4"
+}
+
+###
+
+### 2. Listar Todas as Gravações
+GET {{baseUrl}}/api/records
+
+###
+
+### 3. Buscar Gravação por ID
+GET {{baseUrl}}/api/records/{{recordId}}
+
+###
+
+### 4. Buscar Gravações por Usuário
+GET {{baseUrl}}/api/records/user/{{userId}}
+
+###
+
+### 5. Buscar Gravações por Câmera
+GET {{baseUrl}}/api/records/camera/{{cameraId}}
+
+###
+
+### 6. Buscar Gravações por Academia
+GET {{baseUrl}}/api/records/academy/{{academyId}}
+
+###
+
+### 7. Buscar Gravações por Exercício
+GET {{baseUrl}}/api/records/exercise/{{exerciseId}}
+
+###
+
+### 8. Buscar Gravações por Usuário e Câmera
+GET {{baseUrl}}/api/records/user/{{userId}}/camera/{{cameraId}}
+
+###
+
+### 9. Contar Gravações por Usuário
+GET {{baseUrl}}/api/records/user/{{userId}}/count
+
+###
+
+### 10. Contar Gravações por Câmera
+GET {{baseUrl}}/api/records/camera/{{cameraId}}/count
+
+###
+
+### 11. Atualizar Gravação
+PUT {{baseUrl}}/api/records/{{recordId}}
+Content-Type: application/json
+
+{
+  "url": "https://storage.watchmegym.com/recordings/2024/01/user-123-camera-456-updated.mp4"
+}
+
+###
+
+### 12. Deletar Gravação
+DELETE {{baseUrl}}/api/records/{{recordId}}
+
+###
+
+### === Testes Adicionais ===
+
+### 13. Criar Múltiplas Gravações
+POST {{baseUrl}}/api/records
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "url": "https://storage.watchmegym.com/recordings/2024/01/session-001.mp4"
+}
+
+###
+
+POST {{baseUrl}}/api/records
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "url": "https://storage.watchmegym.com/recordings/2024/01/session-002.mp4"
+}
+
+###
+
+POST {{baseUrl}}/api/records
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "url": "https://storage.watchmegym.com/recordings/2024/01/session-003.mp4"
+}
+
+###
+
+### === Testes de Validação ===
+
+### 14. Criar Gravação - Câmera Inválida
+POST {{baseUrl}}/api/records
+Content-Type: application/json
+
+{
+  "cameraId": "id-invalido",
+  "userId": "{{userId}}",
+  "url": "https://storage.watchmegym.com/test.mp4"
+}
+
+###
+
+### 15. Criar Gravação - Usuário Inválido
+POST {{baseUrl}}/api/records
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "id-invalido",
+  "url": "https://storage.watchmegym.com/test.mp4"
+}
+
+###
+
+### 16. Criar Gravação - URL Inválida
+POST {{baseUrl}}/api/records
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "{{userId}}",
+  "url": "url-invalida"
+}
+
+###
+
+### 17. Criar Gravação - Câmera Inexistente
+POST {{baseUrl}}/api/records
+Content-Type: application/json
+
+{
+  "cameraId": "00000000-0000-0000-0000-000000000000",
+  "userId": "{{userId}}",
+  "url": "https://storage.watchmegym.com/test.mp4"
+}
+
+###
+
+### 18. Criar Gravação - Usuário Inexistente
+POST {{baseUrl}}/api/records
+Content-Type: application/json
+
+{
+  "cameraId": "{{cameraId}}",
+  "userId": "00000000-0000-0000-0000-000000000000",
+  "url": "https://storage.watchmegym.com/test.mp4"
+}
+
+###
+
+### 19. Buscar Gravação - ID Inexistente
+GET {{baseUrl}}/api/records/00000000-0000-0000-0000-000000000000
+
+###
+
+### 20. Atualizar Gravação - URL Inválida
+PUT {{baseUrl}}/api/records/{{recordId}}
+Content-Type: application/json
+
+{
+  "url": "not-a-valid-url"
+}
+
+###

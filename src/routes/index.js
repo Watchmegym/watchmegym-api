@@ -7,6 +7,7 @@ const academyUserRoutes = require('./academyUser.routes');
 const cameraRoutes = require('./camera.routes');
 const exerciseRoutes = require('./exercise.routes');
 const statisticsCameraUserRoutes = require('./statisticsCameraUser.routes');
+const recordRoutes = require('./record.routes');
 
 // Rota básica
 router.get('/', (req, res) => {
@@ -44,5 +45,8 @@ router.use('/api/exercises', exerciseRoutes);
 
 // Rotas de estatísticas
 router.use('/api/statistics', statisticsCameraUserRoutes);
+
+// Rotas de gravações
+router.use('/api/records', recordRoutes);
 
 module.exports = router;
