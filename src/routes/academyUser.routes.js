@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const AcademyUserController = require('../controllers/AcademyUserController');
-const { validate } = require('../middlewares/validate');
+const validate = require('../middlewares/validate');
 const { CreateAcademyUserSchema } = require('../schemas/academyUser.schema');
 
 // Rotas de vínculos academia-usuário

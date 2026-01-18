@@ -17,6 +17,9 @@ model User {
   name      String
   password  String
   active    Boolean  @default(true)
+  cpfCnpj   String?  @unique
+  phone     String?
+  asaasCustomerId String? @unique
   bioimpedancias Bioimpedance[] @relation("UserBioimpedance")
   academyUsers AcademyUser[] @relation("UserAcademy")
   createdAt DateTime @default(now())
@@ -24,6 +27,8 @@ model User {
 
   statisticsCameraUsers StatisticsCameraUserExercise[] @relation("StatisticsCameraUserExercise")
   records Record[] @relation("RecordUser")
+  subscriptions Subscription[] @relation("UserSubscription")
+  payments Payment[] @relation("UserPayment")
 
   @@map("usuarios")
 }
@@ -152,4 +157,78 @@ model Record {
   updatedAt DateTime @updatedAt
 
   @@map("gravacoes")
+}
+
+// ==========================================
+// MODELO: PLANOS DE ASSINATURA
+// ==========================================
+
+model Plan {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String
+  price       Float
+  billingType String   @default("CREDIT_CARD") // CREDIT_CARD, BOLETO, PIX
+  cycle       String   @default("MONTHLY") // MONTHLY, QUARTERLY, YEARLY
+  features    Json?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subscriptions Subscription[] @relation("PlanSubscription")
+
+  @@map("planos")
+}
+
+// ==========================================
+// MODELO: ASSINATURAS
+// ==========================================
+
+model Subscription {
+  id                  String    @id @default(uuid())
+  userId              String
+  user                User      @relation("UserSubscription", fields: [userId], references: [id], onDelete: Restrict)
+  planId              String
+  plan                Plan      @relation("PlanSubscription", fields: [planId], references: [id], onDelete: Restrict)
+  asaasSubscriptionId String?   @unique
+  asaasCustomerId     String?
+  status              String    @default("ACTIVE") // ACTIVE, EXPIRED, CANCELED, SUSPENDED
+  startDate           DateTime  @default(now())
+  endDate             DateTime?
+  nextDueDate         DateTime?
+  paymentMethod       String?   // CREDIT_CARD, BOLETO, PIX
+  autoRenew           Boolean   @default(true)
+  canceledAt          DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  payments Payment[] @relation("SubscriptionPayment")
+
+  @@map("assinaturas")
+}
+
+// ==========================================
+// MODELO: PAGAMENTOS/FATURAS
+// ==========================================
+
+model Payment {
+  id              String       @id @default(uuid())
+  subscriptionId  String?
+  subscription    Subscription? @relation("SubscriptionPayment", fields: [subscriptionId], references: [id], onDelete: SetNull)
+  userId          String
+  user            User         @relation("UserPayment", fields: [userId], references: [id], onDelete: Restrict)
+  asaasPaymentId  String?      @unique
+  amount          Float
+  status          String       @default("PENDING") // PENDING, RECEIVED, CONFIRMED, OVERDUE, REFUNDED, CANCELED
+  billingType     String       // CREDIT_CARD, BOLETO, PIX
+  dueDate         DateTime
+  paymentDate     DateTime?
+  invoiceUrl      String?
+  pixQrCode       String?
+  bankSlipUrl     String?
+  description     String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@map("pagamentos")
 }

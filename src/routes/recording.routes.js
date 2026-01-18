@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const RecordingController = require('../controllers/RecordingController');
-const { validate } = require('../middlewares/validate');
+const validate = require('../middlewares/validate');
 const { StartRecordingSchema, StartMultipleRecordingsSchema } = require('../schemas/recording.schema');
 
 // Rotas de gravação RTSP

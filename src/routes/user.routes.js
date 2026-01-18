@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const UserController = require('../controllers/UserController');
-const { validate } = require('../middlewares/validate');
+const validate = require('../middlewares/validate');
 const { CreateUserSchema, UpdateUserSchema } = require('../schemas/user.schema');
 
 // Rotas de usuários

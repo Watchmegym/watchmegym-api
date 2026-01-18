@@ -9,6 +9,9 @@ const exerciseRoutes = require('./exercise.routes');
 const statisticsCameraUserRoutes = require('./statisticsCameraUser.routes');
 const recordRoutes = require('./record.routes');
 const recordingRoutes = require('./recording.routes');
+const planRoutes = require('./plan.routes');
+const subscriptionRoutes = require('./subscription.routes');
+const paymentRoutes = require('./payment.routes');
 
 // Rota básica
 router.get('/', (req, res) => {
@@ -52,5 +55,14 @@ router.use('/api/records', recordRoutes);
 
 // Rotas de gravação RTSP (Funcionalidade de captura)
 router.use('/api/recordings', recordingRoutes);
+
+// Rotas de planos
+router.use('/api/plans', planRoutes);
+
+// Rotas de assinaturas
+router.use('/api/subscriptions', subscriptionRoutes);
+
+// Rotas de pagamentos
+router.use('/api/payments', paymentRoutes);
 
 module.exports = router;

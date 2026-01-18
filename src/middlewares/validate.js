@@ -3,16 +3,24 @@ const { ZodError } = require('zod');
 /**
  * Middleware para validar dados usando schemas Zod
  * @param {ZodSchema} schema - Schema Zod para validação
+ * @param {String} source - Fonte dos dados: 'body' (padrão) ou 'query'
  * @returns {Function} Middleware Express
  */
-const validate = (schema) => {
+const validate = (schema, source = 'body') => {
   return (req, res, next) => {
     try {
-      // Valida os dados do body
-      const validatedData = schema.parse(req.body);
+      // Determina a fonte dos dados
+      const dataSource = source === 'query' ? req.query : req.body;
       
-      // Substitui req.body pelos dados validados
-      req.body = validatedData;
+      // Valida os dados
+      const validatedData = schema.parse(dataSource);
+      
+      // Substitui os dados validados
+      if (source === 'query') {
+        req.query = validatedData;
+      } else {
+        req.body = validatedData;
+      }
       
       next();
     } catch (error) {
@@ -37,4 +45,4 @@ const validate = (schema) => {
   };
 };
 
-module.exports = { validate };
+module.exports = validate;

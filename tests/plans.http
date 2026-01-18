@@ -1,0 +1,140 @@
+@baseUrl = http://localhost:3000
+@apiUrl = {{baseUrl}}/api
+
+###############################################
+# PLANOS
+###############################################
+
+### 1. Criar Plano Mensal
+POST {{apiUrl}}/plans
+Content-Type: application/json
+
+{
+  "name": "Plano Mensal",
+  "description": "Acesso completo à academia por 1 mês",
+  "price": 99.90,
+  "billingType": "CREDIT_CARD",
+  "cycle": "MONTHLY",
+  "features": [
+    "Acesso ilimitado à academia",
+    "Acompanhamento de treinos",
+    "Gravação de exercícios",
+    "Análise de bioimpedância"
+  ]
+}
+
+### 2. Criar Plano Trimestral
+POST {{apiUrl}}/plans
+Content-Type: application/json
+
+{
+  "name": "Plano Trimestral",
+  "description": "Acesso completo à academia por 3 meses com desconto",
+  "price": 269.90,
+  "billingType": "BOLETO",
+  "cycle": "QUARTERLY",
+  "features": [
+    "Acesso ilimitado à academia",
+    "Acompanhamento de treinos",
+    "Gravação de exercícios",
+    "Análise de bioimpedância",
+    "10% de desconto"
+  ]
+}
+
+### 3. Criar Plano Anual
+POST {{apiUrl}}/plans
+Content-Type: application/json
+
+{
+  "name": "Plano Anual",
+  "description": "Acesso completo à academia por 1 ano com 20% de desconto",
+  "price": 959.90,
+  "billingType": "PIX",
+  "cycle": "YEARLY",
+  "features": [
+    "Acesso ilimitado à academia",
+    "Acompanhamento de treinos",
+    "Gravação de exercícios",
+    "Análise de bioimpedância",
+    "20% de desconto",
+    "1 mês grátis"
+  ]
+}
+
+### 4. Listar Todos os Planos
+GET {{apiUrl}}/plans
+
+### 5. Listar Apenas Planos Ativos
+GET {{apiUrl}}/plans/active
+
+### 6. Listar Planos com Filtros
+GET {{apiUrl}}/plans?active=true&cycle=MONTHLY
+
+### 7. Buscar Plano por ID
+@planId = coloque-id-aqui
+GET {{apiUrl}}/plans/{{planId}}
+
+### 8. Atualizar Plano
+PUT {{apiUrl}}/plans/{{planId}}
+Content-Type: application/json
+
+{
+  "price": 89.90,
+  "description": "Acesso completo à academia por 1 mês - PROMOÇÃO"
+}
+
+### 9. Ativar/Desativar Plano
+PATCH {{apiUrl}}/plans/{{planId}}/toggle-status
+
+### 10. Contar Planos
+GET {{apiUrl}}/plans/count
+
+### 11. Contar Planos Ativos
+GET {{apiUrl}}/plans/count?active=true
+
+### 12. Soft Delete (Desativar)
+DELETE {{apiUrl}}/plans/{{planId}}
+
+### 13. Hard Delete (Apenas sem assinaturas)
+DELETE {{apiUrl}}/plans/{{planId}}/hard
+
+###############################################
+# TESTES DE VALIDAÇÃO (devem retornar erro)
+###############################################
+
+### 14. Criar Plano com Preço Inválido
+POST {{apiUrl}}/plans
+Content-Type: application/json
+
+{
+  "name": "Plano Teste",
+  "description": "Teste",
+  "price": -10,
+  "billingType": "CREDIT_CARD",
+  "cycle": "MONTHLY"
+}
+
+### 15. Criar Plano com Ciclo Inválido
+POST {{apiUrl}}/plans
+Content-Type: application/json
+
+{
+  "name": "Plano Teste 2",
+  "description": "Teste",
+  "price": 99.90,
+  "billingType": "CREDIT_CARD",
+  "cycle": "INVALID"
+}
+
+### 16. Criar Plano com Nome Duplicado (executar após criar o primeiro)
+POST {{apiUrl}}/plans
+Content-Type: application/json
+
+{
+  "name": "Plano Mensal",
+  "description": "Outro plano mensal",
+  "price": 99.90,
+  "billingType": "CREDIT_CARD",
+  "cycle": "MONTHLY"
+}

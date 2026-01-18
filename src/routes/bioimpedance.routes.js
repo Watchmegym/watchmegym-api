@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const BioimpedanceController = require('../controllers/BioimpedanceController');
-const { validate } = require('../middlewares/validate');
+const validate = require('../middlewares/validate');
 const { CreateBioimpedanceSchema, UpdateBioimpedanceSchema } = require('../schemas/bioimpedance.schema');
 
 // Rotas de bioimpedâncias

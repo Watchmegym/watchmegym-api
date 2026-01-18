@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ExerciseController = require('../controllers/ExerciseController');
-const { validate } = require('../middlewares/validate');
+const validate = require('../middlewares/validate');
 const { CreateExerciseSchema, UpdateExerciseSchema } = require('../schemas/exercise.schema');
 
 // Rotas de exercícios

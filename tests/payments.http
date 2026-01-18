@@ -1,0 +1,201 @@
+@baseUrl = http://localhost:3000
+@apiUrl = {{baseUrl}}/api
+
+###############################################
+# PAGAMENTOS
+###############################################
+
+# Variáveis (substitua com IDs reais)
+@userId = coloque-id-do-usuario-aqui
+@subscriptionId = coloque-id-da-assinatura-aqui
+@paymentId = coloque-id-do-pagamento-aqui
+
+### 1. Criar Pagamento Manual
+POST {{apiUrl}}/payments
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "subscriptionId": "{{subscriptionId}}",
+  "amount": 99.90,
+  "billingType": "BOLETO",
+  "dueDate": "2026-02-01T00:00:00.000Z",
+  "description": "Pagamento Plano Mensal - Fevereiro/2026"
+}
+
+### 2. Criar Pagamento Avulso (sem assinatura)
+POST {{apiUrl}}/payments
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "amount": 50.00,
+  "billingType": "PIX",
+  "dueDate": "2026-01-25T00:00:00.000Z",
+  "description": "Taxa de matrícula"
+}
+
+### 3. Listar Todos os Pagamentos
+GET {{apiUrl}}/payments
+
+### 4. Listar Pagamentos Pendentes
+GET {{apiUrl}}/payments?status=PENDING
+
+### 5. Listar Pagamentos Recebidos
+GET {{apiUrl}}/payments?status=RECEIVED
+
+### 6. Listar Pagamentos de um Usuário
+GET {{apiUrl}}/payments?userId={{userId}}
+
+### 7. Listar Meus Pagamentos (usuário logado)
+GET {{apiUrl}}/payments/me?userId={{userId}}
+
+### 8. Listar Meus Pagamentos Pendentes (usuário logado)
+GET {{apiUrl}}/payments/me/pending?userId={{userId}}
+
+### 9. Buscar Pagamento por ID
+GET {{apiUrl}}/payments/{{paymentId}}
+
+### 10. Buscar Pagamentos de um Usuário (rota específica)
+GET {{apiUrl}}/payments/user/{{userId}}
+
+### 11. Buscar Pagamentos Pendentes de um Usuário
+GET {{apiUrl}}/payments/user/{{userId}}/pending
+
+### 12. Total Pago por um Usuário
+GET {{apiUrl}}/payments/user/{{userId}}/total
+
+### 13. Buscar Pagamentos de uma Assinatura
+GET {{apiUrl}}/payments/subscription/{{subscriptionId}}
+
+### 14. Atualizar Pagamento
+PUT {{apiUrl}}/payments/{{paymentId}}
+Content-Type: application/json
+
+{
+  "status": "RECEIVED",
+  "paymentDate": "2026-01-20T10:30:00.000Z"
+}
+
+### 15. Marcar Pagamento como Pago (Admin)
+POST {{apiUrl}}/payments/{{paymentId}}/mark-as-paid
+Content-Type: application/json
+
+{
+  "paymentDate": "2026-01-20T10:30:00.000Z"
+}
+
+### 16. Contar Pagamentos
+GET {{apiUrl}}/payments/count
+
+### 17. Contar Pagamentos Pendentes
+GET {{apiUrl}}/payments/count?status=PENDING
+
+### 18. Contar Pagamentos de um Usuário
+GET {{apiUrl}}/payments/count?userId={{userId}}
+
+### 19. Verificar Pagamentos Vencidos (Admin/Cron)
+POST {{apiUrl}}/payments/check-overdue
+
+### 20. Deletar Pagamento (Admin)
+DELETE {{apiUrl}}/payments/{{paymentId}}
+
+###############################################
+# FILTROS AVANÇADOS
+###############################################
+
+### 21. Listar Pagamentos por Tipo de Cobrança
+GET {{apiUrl}}/payments?billingType=BOLETO
+
+### 22. Listar Pagamentos por Período
+GET {{apiUrl}}/payments?startDate=2026-01-01T00:00:00.000Z&endDate=2026-01-31T23:59:59.999Z
+
+### 23. Listar Pagamentos de uma Assinatura com Status
+GET {{apiUrl}}/payments?subscriptionId={{subscriptionId}}&status=PENDING
+
+###############################################
+# TESTES DE VALIDAÇÃO (devem retornar erro)
+###############################################
+
+### 24. Criar Pagamento com Valor Inválido
+POST {{apiUrl}}/payments
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "amount": -10,
+  "billingType": "BOLETO",
+  "dueDate": "2026-02-01T00:00:00.000Z"
+}
+
+### 25. Criar Pagamento com Data Inválida
+POST {{apiUrl}}/payments
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "amount": 99.90,
+  "billingType": "PIX",
+  "dueDate": "data-invalida"
+}
+
+### 26. Criar Pagamento com Tipo de Cobrança Inválido
+POST {{apiUrl}}/payments
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "amount": 99.90,
+  "billingType": "INVALID",
+  "dueDate": "2026-02-01T00:00:00.000Z"
+}
+
+### 27. Atualizar Pagamento com Status Inválido
+PUT {{apiUrl}}/payments/{{paymentId}}
+Content-Type: application/json
+
+{
+  "status": "INVALID_STATUS"
+}
+
+###############################################
+# SIMULAÇÃO DE FLUXO COMPLETO
+###############################################
+
+### 28. Fluxo: Criar Usuário → Criar Plano → Criar Assinatura → Ver Pagamento Gerado
+
+# Passo 1: Criar usuário (copiar ID retornado)
+POST {{apiUrl}}/users
+Content-Type: application/json
+
+{
+  "email": "teste.pagamento@email.com",
+  "name": "Teste Pagamento",
+  "password": "senha123"
+}
+
+# Passo 2: Criar plano (copiar ID retornado)
+POST {{apiUrl}}/plans
+Content-Type: application/json
+
+{
+  "name": "Plano Teste Completo",
+  "description": "Plano para teste de fluxo completo",
+  "price": 149.90,
+  "billingType": "BOLETO",
+  "cycle": "MONTHLY"
+}
+
+# Passo 3: Criar assinatura (usar IDs dos passos anteriores)
+POST {{apiUrl}}/subscriptions
+Content-Type: application/json
+
+{
+  "userId": "ID-DO-PASSO-1",
+  "planId": "ID-DO-PASSO-2",
+  "paymentMethod": "BOLETO",
+  "autoRenew": true
+}
+
+# Passo 4: Ver pagamentos do usuário (deve ter 1 pagamento PENDING)
+GET {{apiUrl}}/payments/user/ID-DO-PASSO-1

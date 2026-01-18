@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const CameraController = require('../controllers/CameraController');
-const { validate } = require('../middlewares/validate');
+const validate = require('../middlewares/validate');
 const { CreateCameraSchema, UpdateCameraSchema } = require('../schemas/camera.schema');
 
 // Rotas de câmeras

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const StatisticsCameraUserController = require('../controllers/StatisticsCameraUserController');
-const { validate } = require('../middlewares/validate');
+const validate = require('../middlewares/validate');
 const { CreateStatisticsCameraUserSchema, UpdateStatisticsCameraUserSchema } = require('../schemas/statisticsCameraUser.schema');
 
 // Rotas de estatísticas

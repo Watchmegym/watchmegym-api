@@ -1,0 +1,135 @@
+@baseUrl = http://localhost:3000
+@apiUrl = {{baseUrl}}/api
+
+###############################################
+# ASSINATURAS
+###############################################
+
+# Variáveis (substitua com IDs reais)
+@userId = coloque-id-do-usuario-aqui
+@planId = coloque-id-do-plano-aqui
+@subscriptionId = coloque-id-da-assinatura-aqui
+
+### 1. Criar Assinatura
+POST {{apiUrl}}/subscriptions
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "planId": "{{planId}}",
+  "paymentMethod": "CREDIT_CARD",
+  "autoRenew": true
+}
+
+### 2. Criar Assinatura com Dados do Cliente
+POST {{apiUrl}}/subscriptions
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "planId": "{{planId}}",
+  "paymentMethod": "BOLETO",
+  "autoRenew": true,
+  "customer": {
+    "cpfCnpj": "12345678900",
+    "phone": "11987654321",
+    "postalCode": "01310-100",
+    "address": "Av. Paulista",
+    "addressNumber": "1000",
+    "province": "Bela Vista"
+  }
+}
+
+### 3. Listar Todas as Assinaturas
+GET {{apiUrl}}/subscriptions
+
+### 4. Listar Assinaturas Ativas
+GET {{apiUrl}}/subscriptions?status=ACTIVE
+
+### 5. Listar Assinaturas de um Usuário
+GET {{apiUrl}}/subscriptions?userId={{userId}}
+
+### 6. Buscar Minha Assinatura Ativa (usuário logado)
+GET {{apiUrl}}/subscriptions/me?userId={{userId}}
+
+### 7. Buscar Assinatura por ID
+GET {{apiUrl}}/subscriptions/{{subscriptionId}}
+
+### 8. Buscar Assinaturas de um Usuário (rota específica)
+GET {{apiUrl}}/subscriptions/user/{{userId}}
+
+### 9. Buscar Assinatura Ativa de um Usuário
+GET {{apiUrl}}/subscriptions/user/{{userId}}/active
+
+### 10. Atualizar Assinatura
+PUT {{apiUrl}}/subscriptions/{{subscriptionId}}
+Content-Type: application/json
+
+{
+  "autoRenew": false
+}
+
+### 11. Cancelar Assinatura
+POST {{apiUrl}}/subscriptions/{{subscriptionId}}/cancel
+Content-Type: application/json
+
+{
+  "reason": "Não estou usando mais a academia devido a mudança de cidade"
+}
+
+### 12. Reativar Assinatura
+POST {{apiUrl}}/subscriptions/{{subscriptionId}}/reactivate
+
+### 13. Contar Assinaturas
+GET {{apiUrl}}/subscriptions/count
+
+### 14. Contar Assinaturas Ativas
+GET {{apiUrl}}/subscriptions/count?status=ACTIVE
+
+### 15. Verificar Assinaturas Expiradas (Admin/Cron)
+POST {{apiUrl}}/subscriptions/check-expired
+
+### 16. Deletar Assinatura (Admin)
+DELETE {{apiUrl}}/subscriptions/{{subscriptionId}}
+
+###############################################
+# TESTES DE VALIDAÇÃO (devem retornar erro)
+###############################################
+
+### 17. Criar Assinatura com ID Inválido
+POST {{apiUrl}}/subscriptions
+Content-Type: application/json
+
+{
+  "userId": "invalid-id",
+  "planId": "invalid-id",
+  "paymentMethod": "CREDIT_CARD"
+}
+
+### 18. Criar Assinatura com Método de Pagamento Inválido
+POST {{apiUrl}}/subscriptions
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "planId": "{{planId}}",
+  "paymentMethod": "INVALID_METHOD"
+}
+
+### 19. Criar Segunda Assinatura Ativa (deve falhar)
+POST {{apiUrl}}/subscriptions
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "planId": "{{planId}}",
+  "paymentMethod": "PIX"
+}
+
+### 20. Atualizar Status com Valor Inválido
+PUT {{apiUrl}}/subscriptions/{{subscriptionId}}
+Content-Type: application/json
+
+{
+  "status": "INVALID_STATUS"
+}
