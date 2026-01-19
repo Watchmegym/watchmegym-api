@@ -8,7 +8,11 @@ class TrainingExerciseRepository {
         data: trainingExerciseData,
         include: {
           training: true,
-          exercise: true,
+          exercise: {
+            include: {
+              ExerciseVideo: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -22,7 +26,11 @@ class TrainingExerciseRepository {
       return await prisma.trainingExercise.findMany({
         include: {
           training: true,
-          exercise: true,
+          exercise: {
+            include: {
+              ExerciseVideo: true,
+            },
+          },
         },
         orderBy: {
           createdAt: 'desc',
@@ -40,7 +48,11 @@ class TrainingExerciseRepository {
         where: { id },
         include: {
           training: true,
-          exercise: true,
+          exercise: {
+            include: {
+              ExerciseVideo: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -55,7 +67,11 @@ class TrainingExerciseRepository {
         where: { trainingId },
         include: {
           training: true,
-          exercise: true,
+          exercise: {
+            include: {
+              ExerciseVideo: true,
+            },
+          },
         },
         orderBy: {
           createdAt: 'asc',
@@ -73,7 +89,11 @@ class TrainingExerciseRepository {
         where: { exerciseId },
         include: {
           training: true,
-          exercise: true,
+          exercise: {
+            include: {
+              ExerciseVideo: true,
+            },
+          },
         },
         orderBy: {
           createdAt: 'desc',
@@ -106,7 +126,11 @@ class TrainingExerciseRepository {
         data: trainingExerciseData,
         include: {
           training: true,
-          exercise: true,
+          exercise: {
+            include: {
+              ExerciseVideo: true,
+            },
+          },
         },
       });
     } catch (error) {
