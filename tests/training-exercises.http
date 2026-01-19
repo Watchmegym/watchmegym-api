@@ -1,0 +1,178 @@
+### API WatchMeGym - Testes de Exercícios de Treinos
+### Use a extensão REST Client do VS Code para executar estes testes
+
+@baseUrl = http://localhost:3000
+@trainingExerciseId = {{createTrainingExercise.response.body.trainingExercise.id}}
+@trainingId = ecdbb226-09af-4667-8581-b023e9375c02
+@exerciseId = ecdbb226-09af-4667-8581-b023e9375c02
+
+### === Pré-requisitos: Criar um Treino e um Exercício ===
+# @name createTraining
+POST {{baseUrl}}/api/trainings
+Content-Type: application/json
+
+{
+  "name": "Treino de Peito e Tríceps",
+  "description": "Treino focado no desenvolvimento dos músculos peitorais e tríceps"
+}
+
+###
+
+# @name createExercise
+POST {{baseUrl}}/api/exercises
+Content-Type: application/json
+
+{
+  "name": "Supino Reto",
+  "description": "Exercício para desenvolvimento dos músculos peitorais"
+}
+
+###
+
+### 1. Criar Exercício de Treino
+# @name createTrainingExercise
+POST {{baseUrl}}/api/training-exercises
+Content-Type: application/json
+
+{
+  "trainingId": "{{trainingId}}",
+  "exerciseId": "{{exerciseId}}"
+}
+
+###
+
+### 2. Listar Todos os Exercícios de Treinos
+GET {{baseUrl}}/api/training-exercises
+
+###
+
+### 3. Buscar Exercício de Treino por ID
+GET {{baseUrl}}/api/training-exercises/{{trainingExerciseId}}
+
+###
+
+### 4. Buscar Exercícios por Treino
+GET {{baseUrl}}/api/training-exercises/training/{{trainingId}}
+
+###
+
+### 5. Buscar Treinos por Exercício
+GET {{baseUrl}}/api/training-exercises/exercise/{{exerciseId}}
+
+###
+
+### 6. Atualizar Exercício de Treino
+PUT {{baseUrl}}/api/training-exercises/{{trainingExerciseId}}
+Content-Type: application/json
+
+{
+  "trainingId": "{{trainingId}}",
+  "exerciseId": "{{exerciseId}}"
+}
+
+###
+
+### 7. Deletar Exercício de Treino
+DELETE {{baseUrl}}/api/training-exercises/{{trainingExerciseId}}
+
+###
+
+### === Testes Adicionais ===
+
+### 8. Criar Múltiplos Exercícios para um Treino
+POST {{baseUrl}}/api/training-exercises
+Content-Type: application/json
+
+{
+  "trainingId": "{{trainingId}}",
+  "exerciseId": "{{exerciseId}}"
+}
+
+###
+
+### === Testes de Validação ===
+
+### 9. Criar Exercício de Treino - TrainingId Inválido
+POST {{baseUrl}}/api/training-exercises
+Content-Type: application/json
+
+{
+  "trainingId": "invalid-uuid",
+  "exerciseId": "{{exerciseId}}"
+}
+
+###
+
+### 10. Criar Exercício de Treino - ExerciseId Inválido
+POST {{baseUrl}}/api/training-exercises
+Content-Type: application/json
+
+{
+  "trainingId": "{{trainingId}}",
+  "exerciseId": "invalid-uuid"
+}
+
+###
+
+### 11. Criar Exercício de Treino - Treino Não Encontrado
+POST {{baseUrl}}/api/training-exercises
+Content-Type: application/json
+
+{
+  "trainingId": "00000000-0000-0000-0000-000000000000",
+  "exerciseId": "{{exerciseId}}"
+}
+
+###
+
+### 12. Criar Exercício de Treino - Exercício Não Encontrado
+POST {{baseUrl}}/api/training-exercises
+Content-Type: application/json
+
+{
+  "trainingId": "{{trainingId}}",
+  "exerciseId": "00000000-0000-0000-0000-000000000000"
+}
+
+###
+
+### 13. Criar Exercício de Treino - Duplicado
+POST {{baseUrl}}/api/training-exercises
+Content-Type: application/json
+
+{
+  "trainingId": "{{trainingId}}",
+  "exerciseId": "{{exerciseId}}"
+}
+
+###
+
+### 14. Buscar Exercício de Treino - ID Inexistente
+GET {{baseUrl}}/api/training-exercises/00000000-0000-0000-0000-000000000000
+
+###
+
+### 15. Atualizar Exercício de Treino - ID Inexistente
+PUT {{baseUrl}}/api/training-exercises/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "trainingId": "{{trainingId}}"
+}
+
+###
+
+### 16. Deletar Exercício de Treino - ID Inexistente
+DELETE {{baseUrl}}/api/training-exercises/00000000-0000-0000-0000-000000000000
+
+###
+
+### 17. Buscar Exercícios por Treino - Treino Não Encontrado
+GET {{baseUrl}}/api/training-exercises/training/00000000-0000-0000-0000-000000000000
+
+###
+
+### 18. Buscar Treinos por Exercício - Exercício Não Encontrado
+GET {{baseUrl}}/api/training-exercises/exercise/00000000-0000-0000-0000-000000000000
+
+###

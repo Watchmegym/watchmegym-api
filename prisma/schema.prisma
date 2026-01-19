@@ -123,6 +123,7 @@ model Exercise {
 
   cameras Camera[] @relation("ExerciseCamera")
   ExerciseVideo ExerciseVideo[] @relation("ExerciseVideo")    
+  trainings TrainingExercise[] @relation("TrainingExercise")    
   @@map("exercicios")
 }
 
@@ -132,14 +133,39 @@ model ExerciseVideo {
   exercise   Exercise @relation("ExerciseVideo", fields: [exerciseId], references: [id], onDelete: Restrict)
   url String
   thumbnailUrl String?
-  title String?
-  description String?
-  duration Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("videos_exercicios")
 }
+
+// ==========================================
+// MODELO: Treinos
+// ==========================================
+
+model Training {
+  id        String   @id @default(uuid())
+  name String
+  description String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  exercises TrainingExercise[] @relation("TrainingExercise")  
+  @@map("treinos")
+}
+
+model TrainingExercise {
+  id        String   @id @default(uuid())
+  trainingId String
+  training   Training @relation("TrainingExercise", fields: [trainingId], references: [id], onDelete: Restrict)
+  exerciseId String
+  exercise   Exercise @relation("TrainingExercise", fields: [exerciseId], references: [id], onDelete: Restrict)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("exercicios_treinos")
+}
+
 // ==========================================
 // MODELO: Estatísticas X Câmeras X Usuários
 // ==========================================
@@ -157,6 +183,10 @@ model StatisticsCameraUserExercise {
 
   @@map("estatisticas_usuarios_cameras")
 }
+
+
+
+
 
 // ==========================================
 // MODELO: Gravações

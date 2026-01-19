@@ -1,0 +1,147 @@
+### API WatchMeGym - Testes de Treinos
+### Use a extensão REST Client do VS Code para executar estes testes
+
+@baseUrl = http://localhost:3000
+@trainingId = {{createTraining.response.body.training.id}}
+
+### 1. Criar Treino
+# @name createTraining
+POST {{baseUrl}}/api/trainings
+Content-Type: application/json
+
+{
+  "name": "Treino de Peito e Tríceps",
+  "description": "Treino focado no desenvolvimento dos músculos peitorais e tríceps, incluindo exercícios como supino reto, supino inclinado, tríceps pulley e paralelas."
+}
+
+###
+
+### 2. Listar Todos os Treinos
+GET {{baseUrl}}/api/trainings
+
+###
+
+### 3. Buscar Treino por ID
+GET {{baseUrl}}/api/trainings/{{trainingId}}
+
+###
+
+### 4. Buscar Treinos por Nome
+GET {{baseUrl}}/api/trainings/search?name=Peito
+
+###
+
+### 5. Atualizar Treino
+PUT {{baseUrl}}/api/trainings/{{trainingId}}
+Content-Type: application/json
+
+{
+  "name": "Treino Avançado de Peito e Tríceps",
+  "description": "Treino avançado focado no desenvolvimento dos músculos peitorais e tríceps, com técnicas avançadas e maior volume de treino."
+}
+
+###
+
+### 6. Deletar Treino
+DELETE {{baseUrl}}/api/trainings/{{trainingId}}
+
+###
+
+### === Testes Adicionais ===
+
+### 7. Criar Vários Treinos
+POST {{baseUrl}}/api/trainings
+Content-Type: application/json
+
+{
+  "name": "Treino de Costas e Bíceps",
+  "description": "Treino focado no desenvolvimento dos músculos das costas e bíceps, incluindo exercícios como remada, puxada frontal, rosca direta e rosca martelo."
+}
+
+###
+
+POST {{baseUrl}}/api/trainings
+Content-Type: application/json
+
+{
+  "name": "Treino de Pernas",
+  "description": "Treino completo para membros inferiores, incluindo agachamento, leg press, extensora, flexora e panturrilha."
+}
+
+###
+
+POST {{baseUrl}}/api/trainings
+Content-Type: application/json
+
+{
+  "name": "Treino de Ombros",
+  "description": "Treino focado no desenvolvimento dos deltoides, incluindo desenvolvimento, elevação lateral, elevação frontal e remada alta."
+}
+
+###
+
+### === Testes de Validação ===
+
+### 8. Criar Treino - Nome Muito Curto
+POST {{baseUrl}}/api/trainings
+Content-Type: application/json
+
+{
+  "name": "Ab",
+  "description": "Descrição do treino de abdominais"
+}
+
+###
+
+### 9. Criar Treino - Descrição Muito Curta
+POST {{baseUrl}}/api/trainings
+Content-Type: application/json
+
+{
+  "name": "Treino de Abdominais",
+  "description": "Abs"
+}
+
+###
+
+### 10. Criar Treino - Nome Duplicado
+POST {{baseUrl}}/api/trainings
+Content-Type: application/json
+
+{
+  "name": "Treino de Peito e Tríceps",
+  "description": "Outro treino de peito e tríceps"
+}
+
+###
+
+### 11. Atualizar Treino - Nome Duplicado
+PUT {{baseUrl}}/api/trainings/{{trainingId}}
+Content-Type: application/json
+
+{
+  "name": "Treino de Costas e Bíceps"
+}
+
+###
+
+### 12. Buscar Treino - ID Inexistente
+GET {{baseUrl}}/api/trainings/00000000-0000-0000-0000-000000000000
+
+###
+
+### 13. Deletar Treino - ID Inexistente
+DELETE {{baseUrl}}/api/trainings/00000000-0000-0000-0000-000000000000
+
+###
+
+### 14. Buscar Treinos - Parâmetro "name" Ausente
+GET {{baseUrl}}/api/trainings/search
+
+###
+
+### 15. Deletar Treino com Exercícios Associados
+# Primeiro criar um treino e adicionar exercícios, depois tentar deletar
+DELETE {{baseUrl}}/api/trainings/{{trainingId}}
+
+###
