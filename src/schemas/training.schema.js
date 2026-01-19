@@ -9,10 +9,17 @@ const CreateTrainingSchema = z.object({
     .trim(),
   
   description: z
-    .string({ required_error: 'Descrição é obrigatória' })
-    .min(5, 'Descrição deve ter no mínimo 5 caracteres')
-    .max(2000, 'Descrição deve ter no máximo 2000 caracteres')
-    .trim(),
+    .string()
+    .trim()
+    .refine(
+      (val) => val === '' || val.length >= 5,
+      { message: 'Descrição deve ter no mínimo 5 caracteres' }
+    )
+    .refine(
+      (val) => val === '' || val.length <= 2000,
+      { message: 'Descrição deve ter no máximo 2000 caracteres' }
+    )
+    .default(''),
 });
 
 // Schema de validação para atualização de treino
@@ -26,9 +33,15 @@ const UpdateTrainingSchema = z.object({
   
   description: z
     .string()
-    .min(5, 'Descrição deve ter no mínimo 5 caracteres')
-    .max(2000, 'Descrição deve ter no máximo 2000 caracteres')
     .trim()
+    .refine(
+      (val) => val === '' || val.length >= 5,
+      { message: 'Descrição deve ter no mínimo 5 caracteres' }
+    )
+    .refine(
+      (val) => val === '' || val.length <= 2000,
+      { message: 'Descrição deve ter no máximo 2000 caracteres' }
+    )
     .optional(),
 });
 
