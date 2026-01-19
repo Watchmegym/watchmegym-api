@@ -78,13 +78,65 @@ class RecordingService {
   }
 
   /**
+   * Valida se a URL do stream está acessível antes de gravar
+   */
+  async validateStreamUrl(streamUrl) {
+    return new Promise((resolve, reject) => {
+      const http = require('http');
+      const https = require('https');
+      const url = require('url');
+      
+      const parsedUrl = new URL(streamUrl);
+      const client = parsedUrl.protocol === 'https:' ? https : http;
+      
+      // Timeout de 5 segundos
+      const timeout = 5000;
+      const startTime = Date.now();
+      
+      const req = client.get(streamUrl, (res) => {
+        const elapsed = Date.now() - startTime;
+        console.log(`✅ Stream acessível (${res.statusCode}) - ${elapsed}ms`);
+        req.destroy();
+        resolve(true);
+      });
+      
+      req.on('error', (err) => {
+        const elapsed = Date.now() - startTime;
+        console.error(`❌ Erro ao validar stream (${elapsed}ms):`, err.message);
+        reject(new Error(`Stream não acessível: ${err.message}`));
+      });
+      
+      req.setTimeout(timeout, () => {
+        req.destroy();
+        reject(new Error(`Timeout ao validar stream (${timeout}ms)`));
+      });
+      
+      req.on('timeout', () => {
+        req.destroy();
+        reject(new Error(`Timeout ao validar stream (${timeout}ms)`));
+      });
+    });
+  }
+
+  /**
    * Captura stream (RTSP, HTTP, MJPEG) usando FFmpeg
    */
-  captureRTSPStream(streamUrl, outputPath, duration) {
+  async captureRTSPStream(streamUrl, outputPath, duration) {
+    // Validar URL antes de iniciar FFmpeg (apenas para HTTP/HTTPS)
+    const isHTTP = streamUrl.toLowerCase().startsWith('http://') || streamUrl.toLowerCase().startsWith('https://');
+    
+    if (isHTTP) {
+      try {
+        console.log('🔍 Validando acessibilidade do stream...');
+        await this.validateStreamUrl(streamUrl);
+      } catch (error) {
+        throw new Error(`Stream não está acessível: ${error.message}. Verifique se a câmera está online e a URL está correta.`);
+      }
+    }
+    
     return new Promise((resolve, reject) => {
       // Detectar tipo de stream
       const isRTSP = streamUrl.toLowerCase().startsWith('rtsp://');
-      const isHTTP = streamUrl.toLowerCase().startsWith('http://') || streamUrl.toLowerCase().startsWith('https://');
       
       console.log(`🎬 Stream detectado: ${isRTSP ? 'RTSP' : isHTTP ? 'HTTP/MJPEG' : 'Desconhecido'}`);
       
@@ -109,6 +161,11 @@ class RecordingService {
         // Deixar FFmpeg detectar framerate automaticamente
         command.inputOptions([
           '-use_wallclock_as_timestamps', '1', // Usar relógio do sistema
+          '-timeout', '10000000', // Timeout de 10 segundos (em microsegundos)
+          '-reconnect', '1', // Tentar reconectar se desconectar
+          '-reconnect_at_eof', '1',
+          '-reconnect_streamed', '1',
+          '-reconnect_delay_max', '2', // Máximo 2 segundos entre tentativas
         ]);
       }
 
@@ -197,7 +254,20 @@ class RecordingService {
               if (stderr && stderr.length < 500) {
                 console.error('FFmpeg stderr:', stderr);
               }
-              reject(new Error(`Erro ao gravar stream: ${err.message}`));
+              
+              // Mensagens de erro mais amigáveis
+              let errorMessage = err.message;
+              if (err.message.includes('I/O error') || err.message.includes('Error opening input file')) {
+                errorMessage = `Não foi possível acessar a câmera. Verifique se:\n` +
+                  `- A câmera está online e acessível\n` +
+                  `- A URL está correta: ${streamUrl}\n` +
+                  `- Não há firewall bloqueando a conexão\n` +
+                  `- A câmera não requer autenticação adicional`;
+              } else if (err.message.includes('timeout')) {
+                errorMessage = `Timeout ao conectar com a câmera. A câmera pode estar offline ou muito lenta.`;
+              }
+              
+              reject(new Error(`Erro ao gravar stream: ${errorMessage}`));
             }
           }
         })

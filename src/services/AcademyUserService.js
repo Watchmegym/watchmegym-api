@@ -92,6 +92,21 @@ class AcademyUserService {
     }
   }
 
+  // Buscar academias ativas de um usuário
+  async findActiveByUserId(userId) {
+    try {
+      // Verificar se usuário existe
+      const user = await UserRepository.findById(userId);
+      if (!user) {
+        throw new Error('Usuário não encontrado');
+      }
+
+      return await AcademyUserRepository.findActiveByUserId(userId);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Deletar vínculo por ID
   async delete(id) {
     try {

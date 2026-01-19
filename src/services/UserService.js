@@ -1,15 +1,12 @@
-const { CreateUserSchema, UpdateUserSchema, LoginSchema } = require('../schemas/user.schema');
+const { CreateUserSchema, UpdateUserSchema } = require('../schemas/user.schema');
 const UserRepository = require('../repositories/UserRepository');
-const bcrypt = require('bcrypt');
+
+// ⚠️ NOTA: Autenticação agora é gerenciada pelo Supabase Auth
+// UserService agora apenas gerencia dados de perfil (não senha)
+// Para login/registro, use AuthService
 
 class UserService {
-  // Método auxiliar para remover senha do objeto
-  _removePassword(user) {
-    const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword;
-  }
-
-  // Criar novo usuário
+  // Criar novo usuário (SEM senha - gerenciada pelo Supabase)
   async create(userData) {
     try {
       // Validar dados com Zod
@@ -21,20 +18,10 @@ class UserService {
         throw new Error('Email já cadastrado');
       }
 
-      // Criptografar senha
-      const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+      // Salvar no banco (SEM senha)
+      const createdUser = await UserRepository.create(validatedData);
 
-      // Preparar dados do usuário
-      const userToCreate = {
-        ...validatedData,
-        password: hashedPassword
-      };
-
-      // Salvar no banco
-      const createdUser = await UserRepository.create(userToCreate);
-
-      // Retornar usuário sem senha
-      return this._removePassword(createdUser);
+      return createdUser;
     } catch (error) {
       throw error;
     }
@@ -43,8 +30,7 @@ class UserService {
   // Buscar todos os usuários
   async findAll() {
     try {
-      const users = await UserRepository.findAll();
-      return users.map(user => this._removePassword(user));
+      return await UserRepository.findAll();
     } catch (error) {
       throw error;
     }
@@ -57,7 +43,7 @@ class UserService {
       if (!user) {
         throw new Error('Usuário não encontrado');
       }
-      return this._removePassword(user);
+      return user;
     } catch (error) {
       throw error;
     }
@@ -70,7 +56,20 @@ class UserService {
       if (!user) {
         throw new Error('Usuário não encontrado');
       }
-      return this._removePassword(user);
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Buscar usuário por Supabase Auth ID
+  async findBySupabaseAuthId(supabaseAuthId) {
+    try {
+      const user = await UserRepository.findBySupabaseAuthId(supabaseAuthId);
+      if (!user) {
+        throw new Error('Usuário não encontrado');
+      }
+      return user;
     } catch (error) {
       throw error;
     }
@@ -88,11 +87,6 @@ class UserService {
         throw new Error('Usuário não encontrado');
       }
 
-      // Se estiver atualizando a senha, criptografar
-      if (validatedData.password) {
-        validatedData.password = await bcrypt.hash(validatedData.password, 10);
-      }
-
       // Se estiver atualizando email, verificar se já existe
       if (validatedData.email && validatedData.email !== user.email) {
         const existingUser = await UserRepository.findByEmail(validatedData.email);
@@ -103,7 +97,7 @@ class UserService {
 
       // Atualizar no banco
       const updatedUser = await UserRepository.update(id, validatedData);
-      return this._removePassword(updatedUser);
+      return updatedUser;
     } catch (error) {
       throw error;
     }
@@ -138,36 +132,6 @@ class UserService {
       // Deletar permanentemente
       await UserRepository.delete(id);
       return true;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  // Autenticar usuário (login)
-  async authenticate(email, password) {
-    try {
-      // Validar dados com Zod
-      const validatedData = LoginSchema.parse({ email, password });
-
-      // Buscar usuário por email
-      const user = await UserRepository.findByEmail(validatedData.email);
-      if (!user) {
-        throw new Error('Email ou senha inválidos');
-      }
-
-      // Verificar se usuário está ativo
-      if (!user.active) {
-        throw new Error('Usuário inativo');
-      }
-
-      // Verificar senha
-      const isPasswordValid = await bcrypt.compare(validatedData.password, user.password);
-      if (!isPasswordValid) {
-        throw new Error('Email ou senha inválidos');
-      }
-
-      // Retornar usuário sem senha
-      return this._removePassword(user);
     } catch (error) {
       throw error;
     }

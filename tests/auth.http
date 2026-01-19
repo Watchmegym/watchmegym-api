@@ -1,0 +1,298 @@
+### ========================================
+### AUTENTICAÇÃO - TESTES API
+### ========================================
+
+@baseUrl = http://localhost:3000/api
+@email = teste@watchmegym.com
+@password = senha123
+@accessToken = 
+@refreshToken = 
+
+### ========================================
+### 1. REGISTRAR NOVO USUÁRIO
+### ========================================
+
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}",
+  "name": "João Silva Teste",
+  "phone": "+5511999999999",
+  "cpfCnpj": "123.456.789-00"
+}
+
+### Resposta esperada:
+# {
+#   "user": {
+#     "id": "uuid",
+#     "email": "teste@watchmegym.com",
+#     "name": "João Silva Teste",
+#     "phone": "+5511999999999",
+#     "cpfCnpj": "123.456.789-00",
+#     "active": true,
+#     "createdAt": "2026-01-18T..."
+#   },
+#   "message": "Usuário criado com sucesso!",
+#   "session": {
+#     "accessToken": "eyJhbGc...",
+#     "refreshToken": "...",
+#     "expiresIn": 3600,
+#     "expiresAt": 1234567890,
+#     "tokenType": "bearer"
+#   }
+# }
+
+### ========================================
+### 2. FAZER LOGIN
+### ========================================
+
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+### Resposta esperada:
+# {
+#   "user": {
+#     "id": "uuid",
+#     "email": "teste@watchmegym.com",
+#     "name": "João Silva Teste",
+#     "phone": "+5511999999999",
+#     "cpfCnpj": "123.456.789-00",
+#     "active": true,
+#     "createdAt": "2026-01-18T..."
+#   },
+#   "session": {
+#     "accessToken": "eyJhbGc...",
+#     "refreshToken": "...",
+#     "expiresIn": 3600,
+#     "expiresAt": 1234567890,
+#     "tokenType": "bearer"
+#   }
+# }
+
+### ========================================
+### 3. OBTER DADOS DO USUÁRIO LOGADO
+### ========================================
+
+# Após fazer login, copie o accessToken da resposta e cole abaixo
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{accessToken}}
+
+### Resposta esperada:
+# {
+#   "user": {
+#     "id": "uuid",
+#     "email": "teste@watchmegym.com",
+#     "name": "João Silva Teste",
+#     "phone": "+5511999999999",
+#     "cpfCnpj": "123.456.789-00",
+#     "active": true,
+#     "createdAt": "2026-01-18T..."
+#   }
+# }
+
+### ========================================
+### 4. ATUALIZAR TOKENS (REFRESH)
+### ========================================
+
+# Após fazer login, copie o refreshToken da resposta e cole abaixo
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### Resposta esperada:
+# {
+#   "accessToken": "eyJhbGc... (novo)",
+#   "refreshToken": "... (novo)",
+#   "expiresIn": 3600,
+#   "expiresAt": 1234567890,
+#   "tokenType": "bearer"
+# }
+
+### ========================================
+### 5. FAZER LOGOUT
+### ========================================
+
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{accessToken}}
+
+### Resposta esperada:
+# {
+#   "message": "Logout realizado com sucesso"
+# }
+
+### ========================================
+### 6. SOLICITAR RECUPERAÇÃO DE SENHA
+### ========================================
+
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "{{email}}"
+}
+
+### Resposta esperada:
+# {
+#   "message": "Email de recuperação enviado com sucesso!"
+# }
+
+### ========================================
+### 7. RESETAR SENHA (COM TOKEN)
+### ========================================
+
+# Após receber o email, extraia o token e cole abaixo
+POST {{baseUrl}}/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "eyJhbGc... (token do email)",
+  "password": "novaSenha123"
+}
+
+### Resposta esperada:
+# {
+#   "message": "Senha atualizada com sucesso!"
+# }
+
+### ========================================
+### TESTES DE ERRO
+### ========================================
+
+### Erro: Login com email inexistente
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "naoexiste@teste.com",
+  "password": "qualquer"
+}
+
+### Erro: Login com senha incorreta
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "senhaErrada"
+}
+
+### Erro: Registrar com email duplicado
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "senha123",
+  "name": "Teste Duplicado"
+}
+
+### Erro: Email inválido
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "emailinvalido",
+  "password": "senha123"
+}
+
+### Erro: Senha muito curta
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "novo@teste.com",
+  "password": "123",
+  "name": "Teste"
+}
+
+### Erro: Token inválido ou expirado
+GET {{baseUrl}}/auth/me
+Authorization: Bearer token_invalido_aqui
+
+### Erro: Refresh token inválido
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "token_invalido"
+}
+
+### ========================================
+### CASOS DE USO COMPLETOS
+### ========================================
+
+### Fluxo 1: Registro → Login → Acessar Dados
+# 1. Registrar (POST /auth/register)
+# 2. Fazer login (POST /auth/login)
+# 3. Copiar accessToken
+# 4. Obter dados (GET /auth/me com Bearer token)
+
+### Fluxo 2: Login → Usar API → Refresh → Logout
+# 1. Fazer login (POST /auth/login)
+# 2. Copiar accessToken e refreshToken
+# 3. Usar API com Bearer token
+# 4. Quando token expirar, refresh (POST /auth/refresh)
+# 5. Logout (POST /auth/logout)
+
+### Fluxo 3: Esqueci minha senha
+# 1. Solicitar recuperação (POST /auth/forgot-password)
+# 2. Abrir email e copiar token
+# 3. Resetar senha (POST /auth/reset-password com token)
+# 4. Fazer login com nova senha
+
+### ========================================
+### NOTAS
+### ========================================
+
+# 1. Access Token:
+#    - Curta duração (1 hora)
+#    - Usar em todas as requisições autenticadas
+#    - Enviar no header: Authorization: Bearer {accessToken}
+
+# 2. Refresh Token:
+#    - Longa duração (7 dias)
+#    - Usar para obter novos access tokens
+#    - Armazenar de forma segura (nunca expor)
+
+# 3. Fluxo recomendado:
+#    - Armazenar tokens no localStorage/AsyncStorage
+#    - Interceptar requisições para adicionar Bearer token
+#    - Interceptar erro 401 para fazer refresh automático
+#    - Se refresh falhar, redirecionar para login
+
+# 4. Segurança:
+#    - NUNCA commitar tokens no código
+#    - Usar HTTPS em produção
+#    - Implementar rate limiting
+#    - Implementar CORS adequadamente
+
+# 5. Supabase Auth:
+#    - Gerencia autenticação automaticamente
+#    - Sincroniza com banco PostgreSQL
+#    - Envia emails de confirmação/recuperação
+#    - Configure SMTP no painel Supabase
+
+### ========================================
+### CONFIGURAÇÃO NECESSÁRIA
+### ========================================
+
+# No arquivo .env:
+# SUPABASE_URL=https://xxx.supabase.co
+# SUPABASE_SERVICE_ROLE_KEY=eyJhbGc...
+# APP_URL=http://localhost:3000 (para redirect de reset password)
+
+# No painel Supabase (Authentication):
+# 1. Configurar SMTP para envio de emails
+# 2. Personalizar templates de email
+# 3. Configurar redirect URLs permitidas
+# 4. Ativar provedores de login (Google, etc.) se necessário

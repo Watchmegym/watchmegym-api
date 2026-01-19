@@ -1,7 +1,14 @@
 const { z } = require('zod');
 
 // Schema de validação para criação de usuário
+// NOTA: Password NÃO está aqui - é gerenciado pelo Supabase Auth
+// Para criar usuário com autenticação, use AuthService.register()
 const CreateUserSchema = z.object({
+  supabaseAuthId: z
+    .string()
+    .optional()
+    .nullable(),
+
   email: z
     .string({ required_error: 'Email é obrigatório' })
     .email('Email inválido')
@@ -14,12 +21,12 @@ const CreateUserSchema = z.object({
     .max(100, 'Nome deve ter no máximo 100 caracteres')
     .trim(),
   
-  password: z
-    .string({ required_error: 'Senha é obrigatória' })
-    .min(6, 'Senha deve ter no mínimo 6 caracteres')
-    .max(50, 'Senha deve ter no máximo 50 caracteres'),
-  
   phone: z
+    .string()
+    .optional()
+    .nullable(),
+
+  cpfCnpj: z
     .string()
     .optional()
     .nullable(),
@@ -31,7 +38,13 @@ const CreateUserSchema = z.object({
 });
 
 // Schema de validação para atualização de usuário (todos campos opcionais)
+// NOTA: Password NÃO pode ser atualizado aqui - use Supabase Auth
 const UpdateUserSchema = z.object({
+  supabaseAuthId: z
+    .string()
+    .optional()
+    .nullable(),
+
   email: z
     .string()
     .email('Email inválido')
@@ -46,13 +59,12 @@ const UpdateUserSchema = z.object({
     .trim()
     .optional(),
   
-  password: z
-    .string()
-    .min(6, 'Senha deve ter no mínimo 6 caracteres')
-    .max(50, 'Senha deve ter no máximo 50 caracteres')
-    .optional(),
-  
   phone: z
+    .string()
+    .optional()
+    .nullable(),
+
+  cpfCnpj: z
     .string()
     .optional()
     .nullable(),
@@ -62,21 +74,7 @@ const UpdateUserSchema = z.object({
     .optional(),
 });
 
-// Schema para login
-const LoginSchema = z.object({
-  email: z
-    .string({ required_error: 'Email é obrigatório' })
-    .email('Email inválido')
-    .toLowerCase()
-    .trim(),
-  
-  password: z
-    .string({ required_error: 'Senha é obrigatória' })
-    .min(1, 'Senha é obrigatória'),
-});
-
 module.exports = {
   CreateUserSchema,
   UpdateUserSchema,
-  LoginSchema,
 };

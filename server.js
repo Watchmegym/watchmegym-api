@@ -1,5 +1,9 @@
+// Carregar variáveis de ambiente do .env
+require('dotenv').config();
+
 const app = require('./src/app');
 const { PORT } = require('./src/config');
+
 
 // O Render define a porta via variável de ambiente
 const port = process.env.PORT || PORT || 3000;

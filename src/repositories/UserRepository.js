@@ -47,6 +47,17 @@ class UserRepository {
     }
   }
 
+  // Buscar usuário por Supabase Auth ID
+  async findBySupabaseAuthId(supabaseAuthId) {
+    try {
+      return await prisma.user.findUnique({
+        where: { supabaseAuthId }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Atualizar usuário
   async update(id, userData) {
     try {

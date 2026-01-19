@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const authRoutes = require('./auth.routes');
 const userRoutes = require('./user.routes');
 const bioimpedanceRoutes = require('./bioimpedance.routes');
 const academyRoutes = require('./academy.routes');
@@ -28,6 +29,9 @@ router.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+
+// Rotas de autenticação
+router.use('/api/auth', authRoutes);
 
 // Rotas de usuários
 router.use('/api/users', userRoutes);

@@ -119,6 +119,36 @@ class AcademyUserRepository {
     }
   }
 
+  // Buscar academias ativas de um usuário (onde usuário está ativo)
+  async findActiveByUserId(userId) {
+    try {
+      return await prisma.academyUser.findMany({
+        where: {
+          userId,
+          user: {
+            active: true,
+          },
+        },
+        include: {
+          academy: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              active: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Verificar se vínculo já existe
   async findByAcademyAndUser(academyId, userId) {
     try {

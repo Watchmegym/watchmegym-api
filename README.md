@@ -43,6 +43,13 @@ Vídeo: FFmpeg + fluent-ffmpeg
 
 ## ✨ Funcionalidades
 
+### 🔐 Autenticação
+- [x] Registro de usuários com Supabase Auth
+- [x] Login com email/senha
+- [x] JWT tokens (access + refresh)
+- [x] Recuperação de senha por email
+- [x] Verificação de token
+
 ### 👤 Gestão de Usuários
 - [x] CRUD completo de usuários
 - [x] Autenticação com bcrypt
@@ -136,6 +143,7 @@ watchmegym-api/
 │   │   └── supabase.js           # Cliente Supabase + teste automático
 │   │
 │   ├── controllers/              # Camada HTTP (requisições/respostas)
+│   │   ├── AuthController.js     # 🆕 Autenticação
 │   │   ├── UserController.js
 │   │   ├── BioimpedanceController.js
 │   │   ├── AcademyController.js
@@ -147,6 +155,7 @@ watchmegym-api/
 │   │   └── RecordingController.js
 │   │
 │   ├── services/                 # Lógica de negócio
+│   │   ├── AuthService.js        # 🆕 Lógica de autenticação
 │   │   ├── UserService.js
 │   │   ├── BioimpedanceService.js
 │   │   ├── AcademyService.js
@@ -168,6 +177,7 @@ watchmegym-api/
 │   │   └── RecordRepository.js
 │   │
 │   ├── schemas/                  # Validações Zod
+│   │   ├── auth.schema.js        # 🆕 Schemas de autenticação
 │   │   ├── user.schema.js
 │   │   ├── bioimpedance.schema.js
 │   │   ├── academy.schema.js
@@ -183,6 +193,7 @@ watchmegym-api/
 │   │
 │   ├── routes/
 │   │   ├── index.js              # Centralizador de rotas
+│   │   ├── auth.routes.js        # 🆕 Rotas de autenticação
 │   │   ├── user.routes.js
 │   │   ├── bioimpedance.routes.js
 │   │   ├── academy.routes.js
@@ -196,6 +207,7 @@ watchmegym-api/
 │   └── app.js                    # Configuração do Express
 │
 ├── tests/                        # Testes HTTP (REST Client)
+│   ├── auth.http                 # 🆕 Testes de autenticação
 │   ├── users.http
 │   ├── bioimpedances.http
 │   ├── academies.http
@@ -409,6 +421,83 @@ GET /api/health
 ```
 
 Retorna status da API.
+
+---
+
+### 🔐 Autenticação (`/api/auth`)
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/api/auth/register` | Registrar novo usuário |
+| POST | `/api/auth/login` | Fazer login |
+| POST | `/api/auth/logout` | Fazer logout |
+| POST | `/api/auth/refresh` | Atualizar tokens |
+| POST | `/api/auth/forgot-password` | Solicitar recuperação de senha |
+| POST | `/api/auth/reset-password` | Resetar senha com token |
+| GET | `/api/auth/me` | Obter dados do usuário logado |
+
+**Exemplo - Registrar:**
+```json
+POST /api/auth/register
+{
+  "email": "joao@email.com",
+  "name": "João Silva",
+  "password": "senha123",
+  "phone": "+5511999999999",
+  "cpfCnpj": "123.456.789-00"
+}
+```
+
+**Resposta - Registrar/Login:**
+```json
+{
+  "user": {
+    "id": "uuid",
+    "email": "joao@email.com",
+    "name": "João Silva",
+    "phone": "+5511999999999",
+    "cpfCnpj": "123.456.789-00",
+    "active": true,
+    "createdAt": "2026-01-18T..."
+  },
+  "session": {
+    "accessToken": "eyJhbGc...",
+    "refreshToken": "...",
+    "expiresIn": 3600,
+    "expiresAt": 1234567890,
+    "tokenType": "bearer"
+  }
+}
+```
+
+**Exemplo - Login:**
+```json
+POST /api/auth/login
+{
+  "email": "joao@email.com",
+  "password": "senha123"
+}
+```
+
+**Exemplo - Obter Perfil:**
+```http
+GET /api/auth/me
+Authorization: Bearer eyJhbGc...
+```
+
+**Exemplo - Refresh Token:**
+```json
+POST /api/auth/refresh
+{
+  "refreshToken": "refresh_token_aqui"
+}
+```
+
+**Fluxo de Autenticação:**
+1. Registrar ou fazer login → Receber `accessToken` e `refreshToken`
+2. Usar `accessToken` em todas as requisições (header `Authorization: Bearer {token}`)
+3. Quando `accessToken` expirar → Usar `/auth/refresh` para renovar
+4. Se `refreshToken` expirar → Fazer login novamente
 
 ---
 

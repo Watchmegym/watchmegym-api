@@ -3,7 +3,7 @@
 
 @baseUrl = http://localhost:3000
 @academyId = 4539d54e-1065-481f-b0a6-90decbc0b565
-@userId = 8c7e355a-41b8-4373-83cf-6b43ba26c884
+@userId = e9ac15c8-5794-438a-afdd-641915e8fe88
 @linkId = {{createLink.response.body.link.id}}
 
 ### 1. Vincular Usuário à Academia

@@ -11,24 +11,26 @@ datasource db {
 // ==========================================
 // MODELO: USUÁRIOS
 // ==========================================
+// Autenticação gerenciada pelo Supabase Auth
+// Tabela local armazena apenas dados de perfil
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  password  String
-  active    Boolean  @default(true)
-  cpfCnpj   String?  @unique
-  phone     String?
-  asaasCustomerId String? @unique
-  bioimpedancias Bioimpedance[] @relation("UserBioimpedance")
-  academyUsers AcademyUser[] @relation("UserAcademy")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(uuid())
+  supabaseAuthId  String?  @unique  // ID do usuário no auth.users do Supabase
+  email           String   @unique
+  name            String
+  active          Boolean  @default(true)
+  cpfCnpj         String?  @unique
+  phone           String?
+  asaasCustomerId String?  @unique
+  bioimpedancias  Bioimpedance[] @relation("UserBioimpedance")
+  academyUsers    AcademyUser[] @relation("UserAcademy")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   statisticsCameraUsers StatisticsCameraUserExercise[] @relation("StatisticsCameraUserExercise")
-  records Record[] @relation("RecordUser")
-  subscriptions Subscription[] @relation("UserSubscription")
-  payments Payment[] @relation("UserPayment")
+  records         Record[] @relation("RecordUser")
+  subscriptions   Subscription[] @relation("UserSubscription")
+  payments        Payment[] @relation("UserPayment")
 
   @@map("usuarios")
 }

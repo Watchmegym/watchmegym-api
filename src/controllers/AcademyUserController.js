@@ -113,6 +113,32 @@ class AcademyUserController {
     }
   }
 
+  // Buscar academias ativas de um usuário
+  async getActiveByUserId(req, res) {
+    try {
+      const { userId } = req.params;
+      const links = await AcademyUserService.findActiveByUserId(userId);
+
+      return res.status(200).json({
+        message: 'Academias ativas do usuário',
+        academies: links.map(link => link.academy),
+        links
+      });
+    } catch (error) {
+      console.error('Erro ao buscar academias ativas do usuário:', error);
+      
+      if (error.message === 'Usuário não encontrado') {
+        return res.status(404).json({
+          error: error.message
+        });
+      }
+
+      return res.status(500).json({
+        error: 'Erro interno do servidor'
+      });
+    }
+  }
+
   // Deletar vínculo por ID
   async delete(req, res) {
     try {
