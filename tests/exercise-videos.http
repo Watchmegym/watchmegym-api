@@ -1,0 +1,188 @@
+### API WatchMeGym - Testes de Vídeos de Exercícios
+### Use a extensão REST Client do VS Code para executar estes testes
+
+@baseUrl = http://localhost:3000
+@videoId = {{createVideo.response.body.video.id}}
+@exerciseId = ecdbb226-09af-4667-8581-b023e9375c02
+
+### === Pré-requisito: Criar um Exercício ===
+# @name createExercise
+POST {{baseUrl}}/api/exercises
+Content-Type: application/json
+
+{
+  "name": "Supino Reto",
+  "description": "Exercício para desenvolvimento dos músculos peitorais"
+}
+
+###
+
+### 1. Criar Vídeo de Exercício
+# @name createVideo
+POST {{baseUrl}}/api/exercise-videos
+Content-Type: application/json
+
+{
+  "exerciseId": "{{exerciseId}}",
+  "url": "https://example.com/video.mp4",
+  "thumbnailUrl": "https://example.com/thumbnail.jpg",
+  "title": "Como fazer Supino Reto - Tutorial Completo",
+  "description": "Aprenda a técnica correta para executar o supino reto de forma segura e eficiente",
+  "duration": 600
+}
+
+###
+
+### 2. Listar Todos os Vídeos
+GET {{baseUrl}}/api/exercise-videos
+
+###
+
+### 3. Buscar Vídeo por ID
+GET {{baseUrl}}/api/exercise-videos/{{videoId}}
+
+###
+
+### 4. Buscar Vídeos por Exercício
+GET {{baseUrl}}/api/exercise-videos/exercise/{{exerciseId}}
+
+###
+
+### 5. Buscar Vídeos por Título
+GET {{baseUrl}}/api/exercise-videos/search?title=Supino
+
+###
+
+### 6. Atualizar Vídeo
+PUT {{baseUrl}}/api/exercise-videos/{{videoId}}
+Content-Type: application/json
+
+{
+  "title": "Supino Reto - Técnica Avançada",
+  "description": "Tutorial avançado sobre a execução correta do supino reto",
+  "duration": 720
+}
+
+###
+
+### 7. Deletar Vídeo
+DELETE {{baseUrl}}/api/exercise-videos/{{videoId}}
+
+###
+
+### === Testes Adicionais ===
+
+### 8. Criar Vídeo Mínimo (apenas campos obrigatórios)
+POST {{baseUrl}}/api/exercise-videos
+Content-Type: application/json
+
+{
+  "exerciseId": "{{exerciseId}}",
+  "url": "https://example.com/video2.mp4"
+}
+
+###
+
+### 9. Criar Vídeo Completo
+POST {{baseUrl}}/api/exercise-videos
+Content-Type: application/json
+
+{
+  "exerciseId": "{{exerciseId}}",
+  "url": "https://example.com/video3.mp4",
+  "thumbnailUrl": "https://example.com/thumbnail3.jpg",
+  "title": "Supino Reto - Variações",
+  "description": "Aprenda diferentes variações do supino reto para variar seu treino",
+  "duration": 900
+}
+
+###
+
+### === Testes de Validação ===
+
+### 10. Criar Vídeo - ExerciseId Inválido
+POST {{baseUrl}}/api/exercise-videos
+Content-Type: application/json
+
+{
+  "exerciseId": "invalid-uuid",
+  "url": "https://example.com/video.mp4"
+}
+
+###
+
+### 11. Criar Vídeo - URL Inválida
+POST {{baseUrl}}/api/exercise-videos
+Content-Type: application/json
+
+{
+  "exerciseId": "{{exerciseId}}",
+  "url": "não é uma url válida"
+}
+
+###
+
+### 12. Criar Vídeo - Exercício Não Encontrado
+POST {{baseUrl}}/api/exercise-videos
+Content-Type: application/json
+
+{
+  "exerciseId": "00000000-0000-0000-0000-000000000000",
+  "url": "https://example.com/video.mp4"
+}
+
+###
+
+### 13. Criar Vídeo - Título Muito Curto
+POST {{baseUrl}}/api/exercise-videos
+Content-Type: application/json
+
+{
+  "exerciseId": "{{exerciseId}}",
+  "url": "https://example.com/video.mp4",
+  "title": "Ab"
+}
+
+###
+
+### 14. Criar Vídeo - Duração Negativa
+POST {{baseUrl}}/api/exercise-videos
+Content-Type: application/json
+
+{
+  "exerciseId": "{{exerciseId}}",
+  "url": "https://example.com/video.mp4",
+  "duration": -100
+}
+
+###
+
+### 15. Buscar Vídeo - ID Inexistente
+GET {{baseUrl}}/api/exercise-videos/00000000-0000-0000-0000-000000000000
+
+###
+
+### 16. Atualizar Vídeo - ID Inexistente
+PUT {{baseUrl}}/api/exercise-videos/00000000-0000-0000-0000-000000000000
+Content-Type: application/json
+
+{
+  "title": "Novo Título"
+}
+
+###
+
+### 17. Deletar Vídeo - ID Inexistente
+DELETE {{baseUrl}}/api/exercise-videos/00000000-0000-0000-0000-000000000000
+
+###
+
+### 18. Buscar Vídeos por Exercício - Exercício Não Encontrado
+GET {{baseUrl}}/api/exercise-videos/exercise/00000000-0000-0000-0000-000000000000
+
+###
+
+### 19. Buscar Vídeos - Parâmetro "title" Ausente
+GET {{baseUrl}}/api/exercise-videos/search
+
+###

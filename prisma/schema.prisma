@@ -122,10 +122,24 @@ model Exercise {
   updatedAt DateTime @updatedAt
 
   cameras Camera[] @relation("ExerciseCamera")
-
+  ExerciseVideo ExerciseVideo[] @relation("ExerciseVideo")    
   @@map("exercicios")
 }
 
+model ExerciseVideo {
+  id        String   @id @default(uuid())
+  exerciseId String
+  exercise   Exercise @relation("ExerciseVideo", fields: [exerciseId], references: [id], onDelete: Restrict)
+  url String
+  thumbnailUrl String?
+  title String?
+  description String?
+  duration Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("videos_exercicios")
+}
 // ==========================================
 // MODELO: Estatísticas X Câmeras X Usuários
 // ==========================================
