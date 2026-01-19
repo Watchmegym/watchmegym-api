@@ -2,7 +2,7 @@
 ### Use a extensão REST Client do VS Code para executar estes testes
 
 @baseUrl = http://localhost:3000
-@userId = 8c7e355a-41b8-4373-83cf-6b43ba26c884
+@userId = e9ac15c8-5794-438a-afdd-641915e8fe88
 @cameraId = 5d6afd2d-1003-40c5-8354-634370dd29ad
 @statisticsId = {{createStatistics.response.body.statistics.id}}
 
