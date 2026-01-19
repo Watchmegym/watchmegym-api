@@ -79,59 +79,168 @@ class RecordingService {
 
   /**
    * Valida se a URL do stream está acessível antes de gravar
+   * IMPORTANTE: RTSP e streams contínuos (MJPEG) não podem ser validados com HTTP simples
    */
   async validateStreamUrl(streamUrl) {
-    return new Promise((resolve, reject) => {
+    // RTSP não pode ser validado com HTTP - retornar true e deixar FFmpeg validar
+    if (streamUrl.toLowerCase().startsWith('rtsp://')) {
+      console.log('🎥 Stream RTSP detectado - validação será feita pelo FFmpeg');
+      return true;
+    }
+    
+    // Para HTTP/HTTPS, pode ser um stream contínuo (MJPEG) que não responde bem a HEAD/GET
+    // Nesses casos, é melhor deixar o FFmpeg validar durante a gravação
+    if (streamUrl.toLowerCase().startsWith('http://') || streamUrl.toLowerCase().startsWith('https://')) {
+      // Verificar se parece ser um stream (contém palavras-chave comuns)
+      const isLikelyStream = 
+        streamUrl.toLowerCase().includes('/stream') ||
+        streamUrl.toLowerCase().includes('/mjpeg') ||
+        streamUrl.toLowerCase().includes('/video') ||
+        streamUrl.toLowerCase().includes('/live') ||
+        streamUrl.toLowerCase().includes('/cam');
+      
+      if (isLikelyStream) {
+        console.log('📹 Stream HTTP detectado (possivelmente MJPEG) - validação será feita pelo FFmpeg');
+        return true;
+      }
+      
+      // Para URLs HTTP normais, tentar validação rápida
+      // Mas usar try-catch para não bloquear se falhar
+      try {
+        return await this._tryValidateHttpUrl(streamUrl);
+      } catch (error) {
+        // Se falhar, assumir que é um stream e deixar FFmpeg validar
+        console.log(`⚠️  Validação HTTP falhou, assumindo stream contínuo: ${error.message}`);
+        return true;
+      }
+    }
+    
+    // Protocolo desconhecido - deixar FFmpeg validar
+    console.log('⚠️  Protocolo desconhecido - validação será feita pelo FFmpeg');
+    return true;
+  }
+
+  /**
+   * Tenta validar uma URL HTTP de forma não-bloqueante
+   * IMPORTANTE: Sempre resolve como true para não bloquear streams com headers malformados
+   */
+  async _tryValidateHttpUrl(streamUrl) {
+    return new Promise((resolve) => {
       const http = require('http');
       const https = require('https');
-      const url = require('url');
       
       const parsedUrl = new URL(streamUrl);
       const client = parsedUrl.protocol === 'https:' ? https : http;
       
-      // Timeout de 5 segundos
-      const timeout = 5000;
+      // Timeout curto de 2 segundos
+      const timeout = 2000;
       const startTime = Date.now();
+      let resolved = false;
       
-      const req = client.get(streamUrl, (res) => {
-        const elapsed = Date.now() - startTime;
-        console.log(`✅ Stream acessível (${res.statusCode}) - ${elapsed}ms`);
-        req.destroy();
-        resolve(true);
-      });
+      const resolveOnce = (value) => {
+        if (!resolved) {
+          resolved = true;
+          resolve(value);
+        }
+      };
       
+      // Usar GET em vez de HEAD para streams que podem não suportar HEAD
+      let req;
+      try {
+        req = client.get(streamUrl, {
+          timeout: timeout,
+          headers: {
+            'User-Agent': 'WatchMeGym-Recorder/1.0',
+            'Connection': 'close'
+          }
+        }, (res) => {
+          const elapsed = Date.now() - startTime;
+          // Aceitar qualquer status 2xx ou 3xx como válido
+          if (res.statusCode >= 200 && res.statusCode < 400) {
+            console.log(`✅ Stream HTTP acessível (${res.statusCode}) - ${elapsed}ms`);
+          } else {
+            console.log(`⚠️  Stream HTTP retornou status ${res.statusCode} - assumindo válido`);
+          }
+          // Destruir a conexão imediatamente para não baixar dados
+          try {
+            res.destroy();
+            if (req) req.destroy();
+          } catch (e) {
+            // Ignorar erros ao destruir
+          }
+          resolveOnce(true);
+        });
+      } catch (err) {
+        // Erro ao criar requisição - assumir válido
+        console.log(`⚠️  Erro ao criar requisição HTTP: ${err.message} - assumindo stream válido`);
+        resolveOnce(true);
+        return;
+      }
+      
+      // Capturar TODOS os tipos de erro, incluindo parsing errors
       req.on('error', (err) => {
         const elapsed = Date.now() - startTime;
-        console.error(`❌ Erro ao validar stream (${elapsed}ms):`, err.message);
-        reject(new Error(`Stream não acessível: ${err.message}`));
+        // Erros de parsing HTTP são comuns em streams MJPEG - não bloquear
+        console.log(`⚠️  Erro ao validar HTTP (${elapsed}ms): ${err.message} - assumindo stream válido (pode ser MJPEG/stream contínuo)`);
+        try {
+          req.destroy();
+        } catch (e) {
+          // Ignorar
+        }
+        resolveOnce(true); // Sempre resolver como true para não bloquear
       });
       
       req.setTimeout(timeout, () => {
-        req.destroy();
-        reject(new Error(`Timeout ao validar stream (${timeout}ms)`));
+        try {
+          req.destroy();
+        } catch (e) {
+          // Ignorar
+        }
+        // Timeout não significa que o stream não funciona - pode ser apenas lento
+        console.log(`⏱️  Timeout na validação HTTP - assumindo stream válido`);
+        resolveOnce(true);
       });
       
       req.on('timeout', () => {
-        req.destroy();
-        reject(new Error(`Timeout ao validar stream (${timeout}ms)`));
+        try {
+          req.destroy();
+        } catch (e) {
+          // Ignorar
+        }
+        resolveOnce(true);
+      });
+      
+      // Capturar erros não tratados (como parsing errors)
+      process.once('uncaughtException', (err) => {
+        if (err.message && err.message.includes('Parse Error')) {
+          console.log(`⚠️  Parse Error capturado - assumindo stream válido (headers malformados são comuns em streams)`);
+          try {
+            if (req) req.destroy();
+          } catch (e) {
+            // Ignorar
+          }
+          resolveOnce(true);
+        }
       });
     });
   }
 
   /**
    * Captura stream (RTSP, HTTP, MJPEG) usando FFmpeg
+   * A validação será feita pelo próprio FFmpeg - não validamos prévia para evitar erros de parsing
    */
   async captureRTSPStream(streamUrl, outputPath, duration) {
-    // Validar URL antes de iniciar FFmpeg (apenas para HTTP/HTTPS)
     const isHTTP = streamUrl.toLowerCase().startsWith('http://') || streamUrl.toLowerCase().startsWith('https://');
+    const isRTSP = streamUrl.toLowerCase().startsWith('rtsp://');
     
-    if (isHTTP) {
-      try {
-        console.log('🔍 Validando acessibilidade do stream...');
-        await this.validateStreamUrl(streamUrl);
-      } catch (error) {
-        throw new Error(`Stream não está acessível: ${error.message}. Verifique se a câmera está online e a URL está correta.`);
-      }
+    // Não fazer validação prévia - streams podem ter headers malformados (especialmente MJPEG)
+    // O FFmpeg vai validar e retornar erro apropriado se o stream não estiver acessível
+    if (isRTSP) {
+      console.log('🎥 Stream RTSP - validação será feita pelo FFmpeg');
+    } else if (isHTTP) {
+      console.log('📹 Stream HTTP - validação será feita pelo FFmpeg (pode ser MJPEG/stream contínuo)');
+    } else {
+      console.log('⚠️  Protocolo desconhecido - validação será feita pelo FFmpeg');
     }
     
     return new Promise((resolve, reject) => {
