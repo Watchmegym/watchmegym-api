@@ -16,6 +16,7 @@ const recordingRoutes = require('./recording.routes');
 const planRoutes = require('./plan.routes');
 const subscriptionRoutes = require('./subscription.routes');
 const paymentRoutes = require('./payment.routes');
+const userScanFaceVideoRoutes = require('./userScanFaceVideo.routes');
 
 // Rota básica
 router.get('/', (req, res) => {
@@ -80,5 +81,8 @@ router.use('/api/subscriptions', subscriptionRoutes);
 
 // Rotas de pagamentos
 router.use('/api/payments', paymentRoutes);
+
+// Rotas de vídeos de scan face
+router.use('/api/scan-face-videos', userScanFaceVideoRoutes);
 
 module.exports = router;

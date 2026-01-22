@@ -44,6 +44,16 @@ Content-Type: application/json
 
 ###
 
+### 5.1. Atualizar Usuário com Foto de Perfil
+PUT {{baseUrl}}/api/users/{{userId}}
+Content-Type: application/json
+
+{
+  "profilePictureUrl": "https://storage.watchmegym.com/profiles/user-123/profile-picture.jpg"
+}
+
+###
+
 ### 6. Deletar Usuário (soft delete)
 DELETE {{baseUrl}}/api/users/{{userId}}
 
@@ -101,5 +111,27 @@ Content-Type: application/json
 
 ### 11. Buscar Usuário - ID Inexistente
 GET {{baseUrl}}/api/users/00000000-0000-0000-0000-000000000000
+
+###
+
+### 12. Criar Usuário com Foto de Perfil
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "email": "usuario.com.foto@email.com",
+  "name": "Usuário com Foto",
+  "profilePictureUrl": "https://storage.watchmegym.com/profiles/user-456/profile-picture.jpg"
+}
+
+###
+
+### 13. Atualizar Usuário - URL de Foto Inválida
+PUT {{baseUrl}}/api/users/{{userId}}
+Content-Type: application/json
+
+{
+  "profilePictureUrl": "url-invalida"
+}
 
 ###

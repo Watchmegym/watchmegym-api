@@ -1,0 +1,260 @@
+### API WatchMeGym - Testes de Vídeos de Scan Face
+### Use a extensão REST Client do VS Code para executar estes testes
+### ou copie para Postman/Insomnia
+
+@baseUrl = http://localhost:3000
+@token = seu-token-aqui
+@userId = 8c7e355a-41b8-4373-83cf-6b43ba26c884
+@videoId = {{createVideo.response.body.video.id}}
+
+### 1. Criar Vídeo de Scan Face (com URL)
+# @name createVideo
+POST {{baseUrl}}/api/scan-face-videos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "videoUrl": "https://storage.watchmegym.com/scan-face/2024/01/user-123/scan-face-video.mp4"
+}
+
+###
+
+### 2. Criar Vídeo de Scan Face (com Upload de Arquivo)
+# @name createVideoWithUpload
+POST {{baseUrl}}/api/scan-face-videos
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="userId"
+
+{{userId}}
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="video"; filename="scan-face-video.mp4"
+Content-Type: video/mp4
+
+< ./path/to/video.mp4
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### 3. Listar Todos os Vídeos de Scan Face
+GET {{baseUrl}}/api/scan-face-videos
+Authorization: Bearer {{token}}
+
+###
+
+### 4. Buscar Vídeo por ID
+GET {{baseUrl}}/api/scan-face-videos/{{videoId}}
+Authorization: Bearer {{token}}
+
+###
+
+### 5. Buscar Vídeos por Usuário
+GET {{baseUrl}}/api/scan-face-videos/user/{{userId}}
+Authorization: Bearer {{token}}
+
+###
+
+### 6. Buscar Vídeo Mais Recente de um Usuário
+GET {{baseUrl}}/api/scan-face-videos/user/{{userId}}/latest
+Authorization: Bearer {{token}}
+
+###
+
+### 7. Atualizar Vídeo (apenas URL)
+PUT {{baseUrl}}/api/scan-face-videos/{{videoId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "videoUrl": "https://storage.watchmegym.com/scan-face/2024/01/user-123/scan-face-video-updated.mp4"
+}
+
+###
+
+### 8. Atualizar Vídeo (com Upload de Novo Arquivo)
+PUT {{baseUrl}}/api/scan-face-videos/{{videoId}}
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="video"; filename="new-scan-face-video.mp4"
+Content-Type: video/mp4
+
+< ./path/to/new-video.mp4
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+
+### 9. Deletar Vídeo
+DELETE {{baseUrl}}/api/scan-face-videos/{{videoId}}
+Authorization: Bearer {{token}}
+
+###
+
+### === Testes Adicionais ===
+
+### 10. Criar Múltiplos Vídeos para o Mesmo Usuário
+POST {{baseUrl}}/api/scan-face-videos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "videoUrl": "https://storage.watchmegym.com/scan-face/2024/01/user-123/scan-face-video-001.mp4"
+}
+
+###
+
+POST {{baseUrl}}/api/scan-face-videos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "videoUrl": "https://storage.watchmegym.com/scan-face/2024/01/user-123/scan-face-video-002.mp4"
+}
+
+###
+
+POST {{baseUrl}}/api/scan-face-videos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "videoUrl": "https://storage.watchmegym.com/scan-face/2024/01/user-123/scan-face-video-003.mp4"
+}
+
+###
+
+### === Testes de Validação ===
+
+### 11. Criar Vídeo - Usuário Inválido (UUID inválido)
+POST {{baseUrl}}/api/scan-face-videos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "userId": "id-invalido",
+  "videoUrl": "https://storage.watchmegym.com/scan-face/test.mp4"
+}
+
+###
+
+### 12. Criar Vídeo - Usuário Inexistente
+POST {{baseUrl}}/api/scan-face-videos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "userId": "00000000-0000-0000-0000-000000000000",
+  "videoUrl": "https://storage.watchmegym.com/scan-face/test.mp4"
+}
+
+###
+
+### 13. Criar Vídeo - URL Inválida
+POST {{baseUrl}}/api/scan-face-videos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "videoUrl": "url-invalida"
+}
+
+###
+
+### 14. Criar Vídeo - Sem userId
+POST {{baseUrl}}/api/scan-face-videos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "videoUrl": "https://storage.watchmegym.com/scan-face/test.mp4"
+}
+
+###
+
+### 15. Criar Vídeo - Sem videoUrl e sem arquivo
+POST {{baseUrl}}/api/scan-face-videos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}"
+}
+
+###
+
+### 16. Buscar Vídeo - ID Inexistente
+GET {{baseUrl}}/api/scan-face-videos/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+###
+
+### 17. Buscar Vídeos - Usuário Inexistente
+GET {{baseUrl}}/api/scan-face-videos/user/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+###
+
+### 18. Buscar Vídeo Mais Recente - Usuário Sem Vídeos
+GET {{baseUrl}}/api/scan-face-videos/user/00000000-0000-0000-0000-000000000000/latest
+Authorization: Bearer {{token}}
+
+###
+
+### 19. Atualizar Vídeo - ID Inexistente
+PUT {{baseUrl}}/api/scan-face-videos/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "videoUrl": "https://storage.watchmegym.com/scan-face/test.mp4"
+}
+
+###
+
+### 20. Atualizar Vídeo - URL Inválida
+PUT {{baseUrl}}/api/scan-face-videos/{{videoId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "videoUrl": "not-a-valid-url"
+}
+
+###
+
+### 21. Deletar Vídeo - ID Inexistente
+DELETE {{baseUrl}}/api/scan-face-videos/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+###
+
+### === Testes de Autenticação ===
+
+### 22. Criar Vídeo - Sem Token
+POST {{baseUrl}}/api/scan-face-videos
+Content-Type: application/json
+
+{
+  "userId": "{{userId}}",
+  "videoUrl": "https://storage.watchmegym.com/scan-face/test.mp4"
+}
+
+###
+
+### 23. Listar Vídeos - Sem Token
+GET {{baseUrl}}/api/scan-face-videos
+
+###
+
+### 24. Buscar Vídeo - Sem Token
+GET {{baseUrl}}/api/scan-face-videos/{{videoId}}
+
+###

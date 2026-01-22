@@ -31,6 +31,12 @@ const CreateUserSchema = z.object({
     .optional()
     .nullable(),
   
+  profilePictureUrl: z
+    .string()
+    .url('profilePictureUrl deve ser uma URL válida')
+    .optional()
+    .nullable(),
+  
   active: z
     .boolean()
     .optional()
@@ -66,6 +72,12 @@ const UpdateUserSchema = z.object({
 
   cpfCnpj: z
     .string()
+    .optional()
+    .nullable(),
+  
+  profilePictureUrl: z
+    .string()
+    .url('profilePictureUrl deve ser uma URL válida')
     .optional()
     .nullable(),
   

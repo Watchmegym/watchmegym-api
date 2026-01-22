@@ -21,6 +21,7 @@ model User {
   active          Boolean  @default(true)
   cpfCnpj         String?  @unique
   phone           String?
+  profilePictureUrl String?
   asaasCustomerId String?  @unique
   bioimpedancias  Bioimpedance[] @relation("UserBioimpedance")
   academyUsers    AcademyUser[] @relation("UserAcademy")
@@ -31,7 +32,7 @@ model User {
   records         Record[] @relation("RecordUser")
   subscriptions   Subscription[] @relation("UserSubscription")
   payments        Payment[] @relation("UserPayment")
-
+  userScanFaceVideos UserScanFaceVideo[] @relation("UserScanFaceUserVideo")
   @@map("usuarios")
 }
 
@@ -277,4 +278,19 @@ model Payment {
   updatedAt       DateTime     @updatedAt
 
   @@map("pagamentos")
+}
+
+// ==========================================
+// MODELO: SCAN FACE USER VIDEO
+// ==========================================
+
+model UserScanFaceVideo {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation("UserScanFaceUserVideo", fields: [userId], references: [id])
+  videoUrl  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("usuarios_scan_face_videos")
 }

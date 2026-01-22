@@ -2,9 +2,25 @@
 
 Este diretório contém arquivos para testar os endpoints da API.
 
-## 📁 Arquivos
+## 📁 Arquivos de Teste
 
-- **`users.http`** - Arquivo de teste para REST Client (VS Code)
+- **`auth.http`** - Testes de autenticação
+- **`users.http`** - Testes de usuários
+- **`bioimpedances.http`** - Testes de bioimpedâncias
+- **`academies.http`** - Testes de academias
+- **`academy-users.http`** - Testes de vínculos academia-usuário
+- **`cameras.http`** - Testes de câmeras
+- **`exercises.http`** - Testes de exercícios
+- **`exercise-videos.http`** - Testes de vídeos de exercícios
+- **`trainings.http`** - Testes de treinos
+- **`training-exercises.http`** - Testes de exercícios de treinos
+- **`statistics.http`** - Testes de estatísticas
+- **`records.http`** - Testes de gravações (CRUD)
+- **`recordings.http`** - Testes de gravação RTSP
+- **`plans.http`** - Testes de planos
+- **`subscriptions.http`** - Testes de assinaturas
+- **`payments.http`** - Testes de pagamentos
+- **`scan-face-videos.http`** - Testes de vídeos de scan face
 - **`README.md`** - Este arquivo
 
 ## 🚀 Como Usar
@@ -62,31 +78,43 @@ curl -X DELETE http://localhost:3000/api/users/{ID}
 
 Copie as requisições do arquivo `users.http` para sua ferramenta preferida.
 
-## 📋 Endpoints Disponíveis
+## 📋 Principais Endpoints Disponíveis
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
 | GET | `/api/health` | Health check |
+| POST | `/api/auth/register` | Registrar usuário |
+| POST | `/api/auth/login` | Login |
 | POST | `/api/users` | Criar usuário |
 | GET | `/api/users` | Listar usuários |
 | GET | `/api/users/:id` | Buscar usuário por ID |
 | PUT | `/api/users/:id` | Atualizar usuário |
 | DELETE | `/api/users/:id` | Deletar usuário |
+| POST | `/api/scan-face-videos` | Criar vídeo de scan face |
+| GET | `/api/scan-face-videos` | Listar vídeos de scan face |
+| GET | `/api/scan-face-videos/:id` | Buscar vídeo por ID |
+| GET | `/api/scan-face-videos/user/:userId` | Buscar vídeos por usuário |
+| GET | `/api/scan-face-videos/user/:userId/latest` | Buscar vídeo mais recente |
+| PUT | `/api/scan-face-videos/:id` | Atualizar vídeo |
+| DELETE | `/api/scan-face-videos/:id` | Deletar vídeo |
+
+*Consulte os arquivos `.http` individuais para ver todos os endpoints disponíveis.*
 
 ## ✅ Testes de Validação Incluídos
 
-O arquivo `users.http` inclui testes para:
+Cada arquivo `.http` inclui testes para:
 
-1. ✅ Criar usuário válido
-2. ✅ Listar usuários
-3. ✅ Buscar usuário por ID
-4. ✅ Atualizar usuário
-5. ✅ Deletar usuário
-6. ❌ Email inválido
-7. ❌ Nome muito curto
-8. ❌ Senha muito curta
-9. ❌ Email duplicado
-10. ❌ ID inexistente
+### Exemplo: `scan-face-videos.http`
+1. ✅ Criar vídeo com URL
+2. ✅ Criar vídeo com upload de arquivo
+3. ✅ Listar todos os vídeos
+4. ✅ Buscar vídeo por ID
+5. ✅ Buscar vídeos por usuário
+6. ✅ Buscar vídeo mais recente
+7. ✅ Atualizar vídeo
+8. ✅ Deletar vídeo
+9. ❌ Validações de erro (UUID inválido, URL inválida, etc.)
+10. ❌ Testes de autenticação (sem token)
 
 ## 🎯 Fluxo de Teste Completo
 
@@ -96,12 +124,13 @@ O arquivo `users.http` inclui testes para:
    ```
 
 2. **Execute os testes na ordem:**
-   - Health Check
-   - Criar Usuário (salve o ID retornado)
-   - Listar Usuários
-   - Buscar por ID
-   - Atualizar Usuário
-   - Deletar Usuário
+   - Health Check (`/api/health`)
+   - Autenticação (`auth.http`) - Obter token
+   - Criar recursos conforme necessário
+   - Testar CRUD completo
+   - Validar erros e validações
+
+**Nota:** A maioria dos endpoints requer autenticação. Use o token obtido em `auth.http` nas variáveis `@token` dos outros arquivos.
 
 3. **Teste as validações:**
    - Execute os testes de erro para verificar validações
