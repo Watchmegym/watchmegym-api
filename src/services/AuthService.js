@@ -43,6 +43,7 @@ class AuthService {
           name: user.name,
           phone: user.phone,
           cpfCnpj: user.cpfCnpj,
+          profilePictureUrl: user.profilePictureUrl,
           active: user.active,
           createdAt: user.createdAt,
         },
@@ -144,6 +145,7 @@ class AuthService {
           name: user.name,
           phone: user.phone,
           cpfCnpj: user.cpfCnpj,
+          profilePictureUrl: user.profilePictureUrl,
           active: user.active,
           createdAt: user.createdAt,
         },
@@ -363,6 +365,7 @@ class AuthService {
         name: user.name,
         phone: user.phone,
         cpfCnpj: user.cpfCnpj,
+        profilePictureUrl: user.profilePictureUrl,
         active: user.active,
         createdAt: user.createdAt,
       };
