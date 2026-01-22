@@ -16,6 +16,9 @@ router.post('/login', validate(LoginSchema), AuthController.login);
 // POST /api/auth/register - Registrar novo usuário
 router.post('/register', validate(RegisterSchema), AuthController.register);
 
+// POST /api/auth/register-with-files - Registrar com URLs de arquivos já prontas
+router.post('/register-with-files', AuthController.registerWithFiles);
+
 // POST /api/auth/refresh - Atualizar tokens
 router.post('/refresh', validate(RefreshTokenSchema), AuthController.refreshToken);
 

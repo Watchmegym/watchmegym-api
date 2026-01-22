@@ -1,5 +1,8 @@
 const { CreateUserSchema, UpdateUserSchema } = require('../schemas/user.schema');
 const UserRepository = require('../repositories/UserRepository');
+const { supabase } = require('../config/supabase');
+const fs = require('fs').promises;
+const path = require('path');
 
 // ⚠️ NOTA: Autenticação agora é gerenciada pelo Supabase Auth
 // UserService agora apenas gerencia dados de perfil (não senha)
@@ -71,6 +74,48 @@ class UserService {
       }
       return user;
     } catch (error) {
+      throw error;
+    }
+  }
+
+  // Upload de foto de perfil para Supabase Storage
+  async uploadProfilePicture(filePath, userId) {
+    try {
+      if (!supabase) {
+        throw new Error('Supabase não está configurado');
+      }
+
+      // Ler arquivo
+      const fileBuffer = await fs.readFile(filePath);
+      const filename = path.basename(filePath);
+      const ext = path.extname(filename);
+
+      // Definir caminho no storage
+      const storagePath = `profile-pictures/${userId}${ext}`;
+
+      // Upload para Supabase
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('watchmegym')
+        .upload(storagePath, fileBuffer, {
+          contentType: `image/${ext.replace('.', '')}`,
+          upsert: true, // Substituir se já existir
+        });
+
+      if (uploadError) {
+        console.error('Erro ao fazer upload:', uploadError);
+        throw new Error(`Erro ao fazer upload do arquivo: ${uploadError.message}`);
+      }
+
+      // Obter URL pública
+      const { data: publicUrlData } = supabase.storage
+        .from('watchmegym')
+        .getPublicUrl(storagePath);
+
+      console.log(`✅ Upload de foto de perfil para Supabase: ${publicUrlData.publicUrl}`);
+
+      return publicUrlData.publicUrl;
+    } catch (error) {
+      console.error('Erro ao fazer upload da foto de perfil:', error);
       throw error;
     }
   }

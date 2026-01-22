@@ -17,6 +17,7 @@ const planRoutes = require('./plan.routes');
 const subscriptionRoutes = require('./subscription.routes');
 const paymentRoutes = require('./payment.routes');
 const userScanFaceVideoRoutes = require('./userScanFaceVideo.routes');
+const tempUploadRoutes = require('./tempUpload.routes');
 
 // Rota básica
 router.get('/', (req, res) => {
@@ -84,5 +85,8 @@ router.use('/api/payments', paymentRoutes);
 
 // Rotas de vídeos de scan face
 router.use('/api/scan-face-videos', userScanFaceVideoRoutes);
+
+// Rotas de upload temporário (antes de criar usuário)
+router.use('/api/temp-upload', tempUploadRoutes);
 
 module.exports = router;

@@ -8,6 +8,20 @@ class UserRepository {
         data: userData
       });
     } catch (error) {
+      // Tratar erro de constraint única (CPF/CNPJ duplicado)
+      if (error.code === 'P2002') {
+        const target = error.meta?.target || [];
+        if (target.includes('cpfCnpj')) {
+          throw new Error('Este CPF/CNPJ já está cadastrado no sistema');
+        }
+        if (target.includes('email')) {
+          throw new Error('Este email já está cadastrado no sistema');
+        }
+        if (target.includes('supabaseAuthId')) {
+          throw new Error('Este usuário já está cadastrado no sistema');
+        }
+        throw new Error('Dados já cadastrados no sistema');
+      }
       throw error;
     }
   }
@@ -52,6 +66,17 @@ class UserRepository {
     try {
       return await prisma.user.findUnique({
         where: { supabaseAuthId }
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Buscar usuário por CPF/CNPJ
+  async findByCpfCnpj(cpfCnpj) {
+    try {
+      return await prisma.user.findFirst({
+        where: { cpfCnpj }
       });
     } catch (error) {
       throw error;

@@ -36,6 +36,7 @@ class AuthController {
   /**
    * POST /api/auth/register
    * Registrar novo usuário
+   * Agora aceita profilePictureUrl e videoUrl para criar tudo de uma vez
    */
   async register(req, res) {
     try {
@@ -48,7 +49,117 @@ class AuthController {
       console.error('Erro ao registrar usuário:', error);
 
       // Erros de validação retornam 400
-      if (error.message.includes('já está cadastrado')) {
+      if (
+        error.message.includes('já está cadastrado') ||
+        error.message.includes('CPF/CNPJ') ||
+        error.message.includes('Email já está cadastrado')
+      ) {
+        return res.status(400).json({
+          error: error.message,
+        });
+      }
+
+      return res.status(500).json({
+        error: 'Erro ao registrar usuário',
+        details: error.message,
+      });
+    }
+  }
+
+  /**
+   * POST /api/auth/register-with-files
+   * Registrar novo usuário com URLs de arquivos já prontas
+   * Cria o usuário no banco apenas após receber as URLs
+   */
+  async registerWithFiles(req, res) {
+    try {
+      const { email, password, name, phone, cpfCnpj, profilePictureUrl, faceScanVideoUrl } = req.body;
+
+      if (!faceScanVideoUrl) {
+        return res.status(400).json({
+          error: 'Vídeo de scan facial é obrigatório',
+        });
+      }
+
+      // 1. Verificar se email já existe no banco local
+      const UserRepository = require('../repositories/UserRepository');
+      const existingUser = await UserRepository.findByEmail(email);
+      if (existingUser) {
+        throw new Error('Email já está cadastrado');
+      }
+
+      // 1.1. Verificar se CPF/CNPJ já existe (se fornecido)
+      if (cpfCnpj) {
+        const existingCpf = await UserRepository.findByCpfCnpj(cpfCnpj);
+        if (existingCpf) {
+          throw new Error('Este CPF/CNPJ já está cadastrado no sistema');
+        }
+      }
+
+      // 2. Criar apenas no Supabase Auth (não no banco ainda)
+      const { supabase } = require('../config/supabase');
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            phone,
+            cpf_cnpj: cpfCnpj,
+          },
+        },
+      });
+
+      if (authError) {
+        throw new Error(authError.message);
+      }
+
+      // 3. Criar usuário no banco com as URLs já prontas
+      const user = await AuthService.createUserInDatabase(authData.user.id, {
+        email,
+        name,
+        phone,
+        cpfCnpj,
+        profilePictureUrl,
+      });
+
+      // 3. Criar registro do vídeo de scan facial
+      const UserScanFaceVideoService = require('../services/UserScanFaceVideoService');
+      await UserScanFaceVideoService.create({
+        userId: user.id,
+        videoUrl: faceScanVideoUrl,
+      }, null); // null porque a URL já está pronta
+
+      // 4. Retornar dados do usuário
+      return res.status(201).json({
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          phone: user.phone,
+          cpfCnpj: user.cpfCnpj,
+          profilePictureUrl: user.profilePictureUrl,
+          active: user.active,
+          createdAt: user.createdAt,
+        },
+        message: 'Usuário criado com sucesso com foto e vídeo!',
+        session: authData.session ? {
+          accessToken: authData.session.access_token,
+          refreshToken: authData.session.refresh_token,
+          expiresIn: authData.session.expires_in,
+          expiresAt: authData.session.expires_at,
+          tokenType: authData.session.token_type,
+        } : null,
+      });
+    } catch (error) {
+      console.error('Erro ao registrar usuário com arquivos:', error);
+
+      // Erros de validação retornam 400
+      if (
+        error.message.includes('já está cadastrado') ||
+        error.message.includes('CPF/CNPJ') ||
+        error.message.includes('Email já está cadastrado')
+      ) {
         return res.status(400).json({
           error: error.message,
         });

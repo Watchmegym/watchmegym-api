@@ -76,13 +76,21 @@ class AuthService {
       throw new Error('Supabase não está configurado');
     }
 
-    const { email, password, name, phone, cpfCnpj } = userData;
+    const { email, password, name, phone, cpfCnpj, profilePictureUrl } = userData;
 
     try {
       // 1. Verificar se email já existe no banco local
       const existingUser = await UserRepository.findByEmail(email);
       if (existingUser) {
         throw new Error('Email já está cadastrado');
+      }
+
+      // 1.1. Verificar se CPF/CNPJ já existe (se fornecido)
+      if (cpfCnpj) {
+        const existingCpf = await UserRepository.findByCpfCnpj(cpfCnpj);
+        if (existingCpf) {
+          throw new Error('Este CPF/CNPJ já está cadastrado no sistema');
+        }
       }
 
       // 2. Criar usuário no Supabase Auth
@@ -103,14 +111,30 @@ class AuthService {
       }
 
       // 3. Criar usuário no banco local (Prisma) vinculado ao Supabase Auth
-      const user = await UserRepository.create({
-        supabaseAuthId: authData.user.id,  // ← Vincular com auth.users
-        email,
-        name,
-        phone: phone || null,
-        cpfCnpj: cpfCnpj || null,
-        active: true,
-      });
+      // IMPORTANTE: Criar sempre no banco, mas com profilePictureUrl se fornecido
+      // Se não fornecido, será atualizado depois quando os uploads forem feitos
+      let user;
+      try {
+        user = await UserRepository.create({
+          supabaseAuthId: authData.user.id,  // ← Vincular com auth.users
+          email,
+          name,
+          phone: phone || null,
+          cpfCnpj: cpfCnpj || null,
+          profilePictureUrl: profilePictureUrl || null,
+          active: true,
+        });
+      } catch (dbError) {
+        // Se falhar ao criar no Prisma, tentar deletar o usuário do Supabase Auth
+        // para evitar inconsistência (usuário no Auth mas não no banco)
+        try {
+          await supabase.auth.admin.deleteUser(authData.user.id);
+        } catch (deleteError) {
+          console.error('Erro ao deletar usuário do Supabase após falha no Prisma:', deleteError);
+        }
+        // Re-lançar o erro original
+        throw dbError;
+      }
 
       // 4. Retornar dados do usuário (sem senha)
       return {
@@ -139,6 +163,44 @@ class AuthService {
       if (error.message.includes('User already registered')) {
         throw new Error('Email já está cadastrado');
       }
+      throw error;
+    }
+  }
+
+  /**
+   * Criar usuário no banco após uploads
+   * Cria o usuário no banco apenas após receber as URLs dos uploads
+   * @param {string} supabaseAuthId - ID do usuário no Supabase Auth
+   * @param {Object} userData - Dados do usuário (email, name, phone, cpfCnpj, profilePictureUrl)
+   * @returns {Promise<Object>} Dados do usuário criado
+   */
+  async createUserInDatabase(supabaseAuthId, userData) {
+    const { email, name, phone, cpfCnpj, profilePictureUrl } = userData;
+
+    try {
+      // Verificar se usuário já existe no banco
+      const existingUser = await UserRepository.findBySupabaseAuthId(supabaseAuthId);
+      if (existingUser) {
+        // Se já existe, atualizar com as URLs
+        if (profilePictureUrl) {
+          await UserRepository.update(existingUser.id, { profilePictureUrl });
+        }
+        return existingUser;
+      }
+
+      // Criar usuário no banco com as URLs já prontas
+      const user = await UserRepository.create({
+        supabaseAuthId,
+        email,
+        name,
+        phone: phone || null,
+        cpfCnpj: cpfCnpj || null,
+        profilePictureUrl: profilePictureUrl || null,
+        active: true,
+      });
+
+      return user;
+    } catch (error) {
       throw error;
     }
   }
