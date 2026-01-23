@@ -19,13 +19,6 @@ const paymentRoutes = require('./payment.routes');
 const userScanFaceVideoRoutes = require('./userScanFaceVideo.routes');
 const tempUploadRoutes = require('./tempUpload.routes');
 
-// Rota básica
-router.get('/', (req, res) => {
-  res.json({
-    message: 'Bem-vindo à API WatchMeGym!',
-    status: 'online'
-  });
-});
 
 // Rota de health check
 router.get('/api/health', (req, res) => {
@@ -36,7 +29,7 @@ router.get('/api/health', (req, res) => {
 });
 
 // Rota de teste HTML
-router.get('/test', (req, res) => {
+router.get('/', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html lang="pt-br">
