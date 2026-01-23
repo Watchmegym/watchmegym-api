@@ -25,9 +25,10 @@ class BioimpedanceRepository {
             },
           },
         },
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy: [
+          { measureTime: 'desc' },
+          { createdAt: 'desc' }
+        ],
       });
     } catch (error) {
       throw error;
@@ -68,9 +69,10 @@ class BioimpedanceRepository {
             },
           },
         },
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy: [
+          { measureTime: 'desc' },
+          { createdAt: 'desc' }
+        ],
       });
     } catch (error) {
       throw error;
@@ -105,9 +107,10 @@ class BioimpedanceRepository {
     try {
       return await prisma.bioimpedance.findFirst({
         where: { userId },
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy: [
+          { measureTime: 'desc' },
+          { createdAt: 'desc' }
+        ],
         include: {
           user: {
             select: {
