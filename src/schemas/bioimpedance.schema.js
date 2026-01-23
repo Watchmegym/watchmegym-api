@@ -11,6 +11,7 @@ const BioimpedanceBaseSchema = {
 
   // Dados do Usuário na Máquina
   machineUserId: z.string().optional().nullable(),
+  name: z.string().optional().nullable(),
   loginType: z.string().optional().nullable(),
   measureTime: z.preprocess((arg) => {
     if (typeof arg === "string" || arg instanceof Date) return new Date(arg);
