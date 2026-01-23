@@ -53,6 +53,7 @@ model Bioimpedance {
   
   // === INFORMAÇÕES DO USUÁRIO (da máquina) ===
   machineUserId   String?   // ID do usuário na máquina
+  name            String?   // Nome do usuário na máquina
   loginType       String?   // Tipo de login (0, 1, etc)
   measureTime     DateTime? // Horário da medição (chave para upsert)
   address         String?   // Endereço

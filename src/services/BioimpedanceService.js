@@ -147,6 +147,7 @@ class BioimpedanceService {
 
           // Usuário na máquina
           machineUserId: data.userID,
+          name: data.name || null,
           loginType: data.loginType ? String(data.loginType) : null,
           measureTime: new Date(data.measureTime),
           address: data.address || null,
