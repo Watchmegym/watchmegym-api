@@ -7,7 +7,8 @@
     "start": "node server.js",
     "dev": "nodemon --inspect server.js",
     "test": "node tests/test-users.js",
-    "build": "npx prisma generate"
+    "build": "npx prisma generate",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",

@@ -149,7 +149,7 @@ class BioimpedanceService {
           machineUserId: data.userID,
           name: data.name || null,
           loginType: data.loginType ? String(data.loginType) : null,
-          measureTime: new Date(data.measureTime),
+          measureTime: data.measureTime ? new Date(data.measureTime) : null,
           address: data.address || null,
           birthday: data.birthday ? new Date(data.birthday) : null,
           age: data.age ? parseInt(data.age) : null,
@@ -157,9 +157,9 @@ class BioimpedanceService {
           recordNo: data.recordNo || null,
 
           // Dados Básicos
-          weight: parseFloat(data.weight),
-          height: parseFloat(data.height),
-          bmi: parseFloat(data.bmi),
+          weight: data.weight ? parseFloat(data.weight) : null,
+          height: data.height ? parseFloat(data.height) : null,
+          bmi: data.bmi ? parseFloat(data.bmi) : null,
           bmiType: data.bmiType || null,
           bmiStatus: data.bmi_s ? parseInt(data.bmi_s) : null,
           bmiRange: data.bmi_n || null,
@@ -225,7 +225,7 @@ class BioimpedanceService {
           mineralStatus: data.mineral_s ? parseInt(data.mineral_s) : null,
 
           // Metabolismo
-          bmr: parseFloat(data.bmr),
+          bmr: data.bmr ? parseFloat(data.bmr) : null,
           bmrRange: data.bmr_n || null,
           bmrStatus: data.bmr_s ? parseInt(data.bmr_s) : null,
           dci: data.dci ? parseInt(data.dci) : null,
