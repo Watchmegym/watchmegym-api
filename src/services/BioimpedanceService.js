@@ -121,6 +121,7 @@ class BioimpedanceService {
   // Processar Upload da Máquina (Lógica Legada)
   async processMachineUpload(machineData) {
     try {
+      console.log('🚀 Recebendo dados da máquina:', machineData);
       const { deviceModel, unitName, unitNo, macAddr, deviceNo, datas } = machineData;
 
       if (!datas || !Array.isArray(datas) || datas.length === 0) {
