@@ -41,15 +41,129 @@ model User {
 // ==========================================
 model Bioimpedance {
   id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation("UserBioimpedance", fields: [userId], references: [id], onDelete: Restrict) 
-  weight    Float
-  height    Float
-  bmi       Float
-  bmr       Float
+  userId    String?
+  user      User?     @relation("UserBioimpedance", fields: [userId], references: [id], onDelete: Restrict) 
+  
+  // === INFORMAÇÕES DO DISPOSITIVO ===
+  deviceModel     String?   // Modelo do dispositivo (ex: X18_5)
+  unitName        String?   // Nome da unidade
+  unitNo          String?   // Número da unidade
+  macAddr         String?   // Endereço MAC do dispositivo
+  deviceNo        String?   // Número do dispositivo
+  
+  // === INFORMAÇÕES DO USUÁRIO (da máquina) ===
+  machineUserId   String?   // ID do usuário na máquina
+  loginType       String?   // Tipo de login (0, 1, etc)
+  measureTime     DateTime? // Horário da medição (chave para upsert)
+  address         String?   // Endereço
+  birthday        DateTime? // Data de nascimento
+  age             Int?      // Idade
+  sex             Int?      // Sexo (1 = masculino, 2 = feminino)
+  recordNo        String?   // Número do registro
+  
+  // === DADOS BÁSICOS ===
+  weight          Float?     // Peso (kg)
+  height          Float?     // Altura (cm ou m)
+  bmi             Float?     // IMC calculado
+  bmiType         String?   // Tipo de IMC
+  bmiStatus       Int?      // Status do IMC (0=baixo, 1=normal, 2=alto)
+  bmiRange        String?   // Faixa normal do IMC (ex: "18.5-24.9")
+  weightStatus    Int?      // Status do peso
+  weightRange     String?   // Faixa normal do peso (ex: "56.7 - 76.5")
+  
+  // === ÁGUA CORPORAL ===
+  waterECW        Float?    // Água extracelular (kg)
+  waterECWRange   String?   // Faixa normal
+  waterECWStatus  Int?      // Status
+  waterICW        Float?    // Água intracelular (kg)
+  waterICWRange   String?   // Faixa normal
+  waterICWStatus  Int?      // Status
+  waterRate       Float?    // Taxa de água corporal (%)
+  waterRateRange  String?   // Faixa normal
+  waterRateStatus Int?      // Status
+  
+  // === PROTEÍNA ===
+  protein         Float?    // Proteína (kg)
+  proteinRange    String?   // Faixa normal
+  proteinStatus   Int?      // Status
+  
+  // === OSSOS ===
+  bone            Float?    // Massa óssea (kg)
+  boneRange       String?   // Faixa normal
+  boneStatus      Int?      // Status
+  
+  // === CORPO GERAL ===
+  bodyShape       String?   // Forma corporal (ex: "Bem torneado")
+  bodyScore       Int?      // Pontuação corporal (0-100)
+  bodyAge         Int?      // Idade corporal
+  
+  // === MASSA MAGRA ===
+  fatFree         Float?    // Massa livre de gordura (kg)
+  fatFreeRange    String?   // Faixa normal
+  fatFreeStatus   Int?      // Status
+  
+  // === GORDURA GERAL ===
+  fat             Float?    // Gordura total (kg)
+  fatRate         Float?    // Taxa de gordura (%)
+  fatRateRange    String?   // Faixa normal
+  fatRateStatus   Int?      // Status
+  
+  // === GORDURA POR REGIÃO ===
+  fatLeftLeg      Float?    // Gordura perna esquerda (kg)
+  fatRightLeg     Float?    // Gordura perna direita (kg)
+  fatLeftArm      Float?    // Gordura braço esquerdo (kg)
+  fatRightArm     Float?    // Gordura braço direito (kg)
+  fatTrunk        Float?    // Gordura tronco (kg)
+  
+  // === MASSA MUSCULAR ===
+  muscleRate      Float?    // Taxa muscular (%)
+  muscleRateRange String?   // Faixa normal
+  muscleRateStatus Int?     // Status
+  muscleLeftLeg   Float?    // Músculo perna esquerda (kg)
+  muscleRightLeg  Float?    // Músculo perna direita (kg)
+  muscleLeftArm   Float?    // Músculo braço esquerdo (kg)
+  muscleRightArm  Float?    // Músculo braço direito (kg)
+  muscleTrunk     Float?    // Músculo tronco (kg)
+  skeletalMuscle  Float?    // Músculo esquelético (kg)
+  
+  // === MINERAIS ===
+  mineral         Float?    // Minerais (kg)
+  mineralRange    String?   // Faixa normal
+  mineralStatus   Int?      // Status
+  
+  // === METABOLISMO ===
+  bmr             Float     // Taxa metabólica basal (kcal)
+  bmrRange        String?   // Faixa normal
+  bmrStatus       Int?      // Status
+  dci             Int?      // Ingestão calórica diária recomendada (kcal)
+  
+  // === GORDURA VISCERAL ===
+  visceralFat       Int?    // Nível de gordura visceral (1-59)
+  visceralFatRange  String? // Faixa normal (ex: "1.0 - 9.0")
+  visceralFatStatus Int?    // Status
+  
+  // === GORDURA SUBCUTÂNEA ===
+  fatSubcutaneousRate   Float?  // Taxa de gordura subcutânea (%)
+  fatSubcutaneousRange  String? // Faixa normal
+  fatSubcutaneousStatus Int?    // Status
+  
+  // === AJUSTES RECOMENDADOS ===
+  weightAdjustment Float?   // Ajuste de peso recomendado (kg)
+  muscleAdjustment Float?   // Ajuste de músculo recomendado (kg)
+  fatAdjustment    Float?   // Ajuste de gordura recomendado (kg)
+  
+  // === ATIVIDADES RECOMENDADAS (minutos) ===
+  swimMinutes     Int?      // Minutos de natação
+  walkingMinutes  Int?      // Minutos de caminhada
+  joggingMinutes  Int?      // Minutos de corrida
+  aerobicMinutes  Int?      // Minutos de aeróbico
+  
+  // === TIMESTAMPS ===
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Índice para busca por measureTime (upsert)
+  @@index([userId, measureTime])
   @@map("bioimpedancias")
 }
 

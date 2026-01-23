@@ -5,16 +5,7 @@ class BioimpedanceRepository {
   async create(bioimpedanceData) {
     try {
       return await prisma.bioimpedance.create({
-        data: bioimpedanceData,
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-        },
+        data: bioimpedanceData
       });
     } catch (error) {
       throw error;
@@ -91,16 +82,7 @@ class BioimpedanceRepository {
     try {
       return await prisma.bioimpedance.update({
         where: { id },
-        data: bioimpedanceData,
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-        },
+        data: bioimpedanceData
       });
     } catch (error) {
       throw error;
@@ -135,6 +117,41 @@ class BioimpedanceRepository {
             },
           },
         },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Buscar por usuário e horário de medição (para evitar duplicatas)
+  async findByMeasureTime(userId, measureTime) {
+    try {
+      return await prisma.bioimpedance.findFirst({
+        where: {
+          userId,
+          measureTime,
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Criar ou Atualizar (Upsert) vindo da máquina
+  async upsertFromMachine(userId, measureTime, data) {
+    try {
+      // Procuramos se já existe um registro para este usuário neste horário exato
+      // Importante: measureTime pode ser nulo se não vier da máquina corretamente
+      const existing = measureTime ? await this.findByMeasureTime(userId, measureTime) : null;
+
+      if (existing) {
+        return await this.update(existing.id, data);
+      }
+
+      // Ao criar, garantimos que o userId e data estão corretos
+      return await this.create({
+        ...data,
+        userId, // Garante que o userId do sistema seja usado
       });
     } catch (error) {
       throw error;

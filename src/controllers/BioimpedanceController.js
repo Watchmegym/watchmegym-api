@@ -48,7 +48,7 @@ class BioimpedanceController {
       });
     } catch (error) {
       console.error('Erro ao buscar bioimpedância:', error);
-      
+
       if (error.message === 'Bioimpedância não encontrada') {
         return res.status(404).json({
           error: error.message
@@ -73,7 +73,7 @@ class BioimpedanceController {
       });
     } catch (error) {
       console.error('Erro ao buscar bioimpedâncias do usuário:', error);
-      
+
       if (error.message === 'Usuário não encontrado') {
         return res.status(404).json({
           error: error.message
@@ -98,9 +98,9 @@ class BioimpedanceController {
       });
     } catch (error) {
       console.error('Erro ao buscar última bioimpedância:', error);
-      
-      if (error.message === 'Usuário não encontrado' || 
-          error.message === 'Nenhuma bioimpedância encontrada para este usuário') {
+
+      if (error.message === 'Usuário não encontrado' ||
+        error.message === 'Nenhuma bioimpedância encontrada para este usuário') {
         return res.status(404).json({
           error: error.message
         });
@@ -125,7 +125,7 @@ class BioimpedanceController {
       });
     } catch (error) {
       console.error('Erro ao atualizar bioimpedância:', error);
-      
+
       if (error.message === 'Bioimpedância não encontrada') {
         return res.status(404).json({
           error: error.message
@@ -149,7 +149,7 @@ class BioimpedanceController {
       });
     } catch (error) {
       console.error('Erro ao deletar bioimpedância:', error);
-      
+
       if (error.message === 'Bioimpedância não encontrada') {
         return res.status(404).json({
           error: error.message
@@ -158,6 +158,28 @@ class BioimpedanceController {
 
       return res.status(500).json({
         error: 'Erro interno do servidor'
+      });
+    }
+  }
+
+  // Receber upload da máquina (protocolo legado)
+  async upload(req, res) {
+    try {
+      const machineData = req.body;
+      const results = await BioimpedanceService.processMachineUpload(machineData);
+
+      // A máquina espera o formato { recode: 2000, remsg: 'success' }
+      return res.status(200).json({
+        recode: 2000,
+        remsg: 'success',
+        processed: results.length
+      });
+    } catch (error) {
+      console.error('Erro no upload da máquina:', error);
+      return res.status(500).json({
+        recode: 5000,
+        remsg: 'processing error',
+        error: error.message
       });
     }
   }

@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "bioimpedancias" ALTER COLUMN "weight" DROP NOT NULL,
+ALTER COLUMN "height" DROP NOT NULL,
+ALTER COLUMN "bmi" DROP NOT NULL;
