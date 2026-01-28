@@ -72,7 +72,13 @@ class UserRepository {
     }
   }
 
-  // Buscar usuário por CPF/CNPJ
+  // Normalizar CPF/CNPJ (remover formatação: pontos, traços, barras, espaços)
+  normalizeCpfCnpj(cpfCnpj) {
+    if (!cpfCnpj) return null;
+    return cpfCnpj.replace(/[.\-\/ ]/g, '');
+  }
+
+  // Buscar usuário por CPF/CNPJ (busca exata)
   async findByCpfCnpj(cpfCnpj) {
     try {
       return await prisma.user.findFirst({
@@ -80,6 +86,60 @@ class UserRepository {
       });
     } catch (error) {
       throw error;
+    }
+  }
+
+  // Buscar usuário por CPF/CNPJ normalizado (ignora formatação)
+  // Útil quando a máquina envia CPF sem formatação mas no banco está formatado
+  // Exemplo: máquina envia "17008139780", banco tem "170.081.397-80"
+  async findByCpfCnpjNormalized(cpfCnpj) {
+    try {
+      if (!cpfCnpj) return null;
+      
+      // Normalizar o CPF recebido (remover formatação)
+      const normalized = this.normalizeCpfCnpj(cpfCnpj);
+      
+      if (!normalized) return null;
+
+      // Usar SQL raw para buscar comparando CPFs normalizados
+      // Remove formatação do CPF no banco e compara com o normalizado recebido
+      const users = await prisma.$queryRaw`
+        SELECT * FROM usuarios
+        WHERE "cpfCnpj" IS NOT NULL
+        AND REPLACE(REPLACE(REPLACE(REPLACE("cpfCnpj", '.', ''), '-', ''), '/', ''), ' ', '') = ${normalized}
+        LIMIT 1
+      `;
+
+      if (users && users.length > 0) {
+        // Converter o resultado raw para o formato do Prisma
+        return users[0];
+      }
+
+      return null;
+    } catch (error) {
+      // Se falhar com SQL raw, tentar método alternativo (buscar todos e filtrar)
+      console.warn('Erro ao buscar por CPF normalizado com SQL raw, tentando método alternativo:', error.message);
+      
+      try {
+        const users = await prisma.user.findMany({
+          where: {
+            cpfCnpj: {
+              not: null
+            }
+          }
+        });
+
+        // Filtrar comparando CPFs normalizados
+        const user = users.find(u => {
+          if (!u.cpfCnpj) return false;
+          const userNormalized = this.normalizeCpfCnpj(u.cpfCnpj);
+          return userNormalized === normalized;
+        });
+
+        return user || null;
+      } catch (fallbackError) {
+        throw fallbackError;
+      }
     }
   }
 

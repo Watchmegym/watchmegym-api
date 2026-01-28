@@ -251,13 +251,30 @@ class BioimpedanceService {
         };
 
         // 2. Tentar encontrar o usuário no nosso sistema
+        // A máquina envia machineUserId que é o CPF/CNPJ sem formatação
         let userId = null;
-        const user = await UserRepository.findById(data.userId || data.userID);
-
-        if (user) {
-          userId = user.id;
+        const machineUserId = data.userID || data.userId;
+        
+        if (machineUserId) {
+          // Primeiro tenta buscar por ID direto (caso seja UUID)
+          let user = await UserRepository.findById(machineUserId);
+          
+          // Se não encontrou, tenta buscar por CPF/CNPJ normalizado
+          // (a máquina envia CPF sem formatação: 17008139780)
+          // mas no banco pode estar formatado: 170.081.397-80
+          if (!user) {
+            user = await UserRepository.findByCpfCnpjNormalized(machineUserId);
+          }
+          
+          if (user) {
+            userId = user.id;
+            console.log(`✅ Usuário encontrado: ${user.name} (${user.email}) - CPF: ${user.cpfCnpj}`);
+          } else {
+            console.log(`⚠️ Usuário não encontrado para machineUserId: ${machineUserId}. Salvando como medição sem vínculo.`);
+            console.log(`   💡 Dica: Verifique se o CPF/CNPJ "${machineUserId}" está cadastrado no sistema.`);
+          }
         } else {
-          console.log(`⚠️ Usuário ${data.userId || data.userID} não encontrado. Salvando como medição sem vínculo.`);
+          console.log(`⚠️ machineUserId não fornecido. Salvando como medição sem vínculo.`);
         }
 
         // 3. Executar Upsert
