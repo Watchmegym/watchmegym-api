@@ -114,33 +114,59 @@ class AuthController {
         throw new Error(authError.message);
       }
 
-      // 3. Criar usuário no banco com as URLs já prontas
-      const user = await AuthService.createUserInDatabase(authData.user.id, {
-        email,
-        name,
-        phone,
-        cpfCnpj,
-        profilePictureUrl,
-      });
+      // Guardar o ID do usuário criado no Auth para possível rollback
+      const supabaseAuthId = authData.user.id;
 
-      // 3. Criar registro do vídeo de scan facial
-      const UserScanFaceVideoService = require('../services/UserScanFaceVideoService');
-      await UserScanFaceVideoService.create({
-        userId: user.id,
-        videoUrl: faceScanVideoUrl,
-      }, null); // null porque a URL já está pronta
+      try {
+        // 3. Criar usuário no banco com as URLs já prontas
+        const user = await AuthService.createUserInDatabase(supabaseAuthId, {
+          email,
+          name,
+          phone,
+          cpfCnpj,
+          profilePictureUrl,
+        });
 
-      // 4. Retornar dados do usuário
+        // 4. Criar registro do vídeo de scan facial
+        const UserScanFaceVideoService = require('../services/UserScanFaceVideoService');
+        await UserScanFaceVideoService.create({
+          userId: user.id,
+          videoUrl: faceScanVideoUrl,
+        }, null); // null porque a URL já está pronta
+
+        // Se chegou aqui, tudo foi criado com sucesso
+      } catch (dbError) {
+        // Se falhar ao criar no banco, fazer rollback: deletar do Supabase Auth
+        console.error('Erro ao criar usuário no banco, fazendo rollback do Supabase Auth:', dbError);
+        try {
+          await supabase.auth.admin.deleteUser(supabaseAuthId);
+          console.log('✅ Usuário removido do Supabase Auth após falha no banco');
+        } catch (deleteError) {
+          console.error('⚠️  Erro ao deletar usuário do Supabase Auth após rollback:', deleteError);
+          // Continuar mesmo se falhar o delete (pode ser limpo manualmente depois)
+        }
+        // Re-lançar o erro original para que o cliente saiba que falhou
+        throw dbError;
+      }
+
+      // 5. Buscar usuário criado para retornar (UserRepository já foi requerido acima)
+      const createdUser = await UserRepository.findBySupabaseAuthId(supabaseAuthId);
+      
+      if (!createdUser) {
+        throw new Error('Erro ao buscar usuário criado');
+      }
+
+      // 6. Retornar dados do usuário
       return res.status(201).json({
         user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          phone: user.phone,
-          cpfCnpj: user.cpfCnpj,
-          profilePictureUrl: user.profilePictureUrl,
-          active: user.active,
-          createdAt: user.createdAt,
+          id: createdUser.id,
+          email: createdUser.email,
+          name: createdUser.name,
+          phone: createdUser.phone,
+          cpfCnpj: createdUser.cpfCnpj,
+          profilePictureUrl: createdUser.profilePictureUrl,
+          active: createdUser.active,
+          createdAt: createdUser.createdAt,
         },
         message: 'Usuário criado com sucesso com foto e vídeo!',
         session: authData.session ? {
