@@ -297,6 +297,44 @@ class AuthController {
   }
 
   /**
+   * POST /api/auth/change-password
+   * Alterar senha do usuário logado (requer token + senha atual)
+   */
+  async changePassword(req, res) {
+    try {
+      const accessToken = req.headers.authorization?.replace('Bearer ', '');
+      const { currentPassword, newPassword } = req.body;
+
+      if (!accessToken) {
+        return res.status(401).json({
+          error: 'Token não fornecido',
+        });
+      }
+
+      const result = await AuthService.changePassword(
+        accessToken,
+        currentPassword,
+        newPassword,
+      );
+
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error('Erro ao alterar senha:', error);
+
+      if (error.message.includes('Senha atual incorreta')) {
+        return res.status(400).json({
+          error: error.message,
+        });
+      }
+
+      return res.status(500).json({
+        error: 'Erro ao alterar senha',
+        details: error.message,
+      });
+    }
+  }
+
+  /**
    * GET /api/auth/me
    * Obter dados do usuário logado
    */

@@ -71,10 +71,23 @@ const ResetPasswordSchema = z.object({
     .max(50, 'Senha deve ter no máximo 50 caracteres'),
 });
 
+// Schema para alterar senha (usuário logado)
+const ChangePasswordSchema = z.object({
+  currentPassword: z
+    .string({ required_error: 'Senha atual é obrigatória' })
+    .min(1, 'Senha atual é obrigatória'),
+  
+  newPassword: z
+    .string({ required_error: 'Nova senha é obrigatória' })
+    .min(6, 'Nova senha deve ter no mínimo 6 caracteres')
+    .max(50, 'Nova senha deve ter no máximo 50 caracteres'),
+});
+
 module.exports = {
   LoginSchema,
   RegisterSchema,
   RefreshTokenSchema,
   ForgotPasswordSchema,
   ResetPasswordSchema,
+  ChangePasswordSchema,
 };

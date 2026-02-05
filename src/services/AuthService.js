@@ -324,6 +324,57 @@ class AuthService {
   }
 
   /**
+   * Alterar senha do usuário logado
+   * @param {string} accessToken - Access token do usuário
+   * @param {string} currentPassword - Senha atual
+   * @param {string} newPassword - Nova senha
+   * @returns {Promise<Object>}
+   */
+  async changePassword(accessToken, currentPassword, newPassword) {
+    if (!supabase) {
+      throw new Error('Supabase não está configurado');
+    }
+
+    try {
+      // 1. Verificar token e obter usuário
+      const userData = await this.verifyToken(accessToken);
+      const user = await UserRepository.findBySupabaseAuthId(userData.supabaseAuthId);
+      if (!user) {
+        throw new Error('Usuário não encontrado');
+      }
+
+      // 2. Verificar senha atual
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+
+      if (signInError) {
+        if (signInError.message.includes('Invalid login credentials')) {
+          throw new Error('Senha atual incorreta');
+        }
+        throw new Error(signInError.message);
+      }
+
+      // 3. Atualizar senha no Supabase (admin API)
+      const { error: updateError } = await supabase.auth.admin.updateUserById(
+        user.supabaseAuthId,
+        { password: newPassword },
+      );
+
+      if (updateError) {
+        throw new Error(updateError.message);
+      }
+
+      return {
+        message: 'Senha alterada com sucesso!',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
    * Verificar se access token é válido
    * @param {string} accessToken - Access token
    * @returns {Promise<Object>} Dados do usuário se válido

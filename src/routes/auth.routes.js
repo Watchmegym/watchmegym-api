@@ -2,12 +2,14 @@ const express = require('express');
 const router = express.Router();
 const AuthController = require('../controllers/AuthController');
 const validate = require('../middlewares/validate');
+const { auth } = require('../middlewares/auth');
 const {
   LoginSchema,
   RegisterSchema,
   RefreshTokenSchema,
   ForgotPasswordSchema,
   ResetPasswordSchema,
+  ChangePasswordSchema,
 } = require('../schemas/auth.schema');
 
 // POST /api/auth/login - Fazer login
@@ -30,6 +32,9 @@ router.post('/forgot-password', validate(ForgotPasswordSchema), AuthController.f
 
 // POST /api/auth/reset-password - Resetar senha
 router.post('/reset-password', validate(ResetPasswordSchema), AuthController.resetPassword);
+
+// POST /api/auth/change-password - Alterar senha (usuário logado) - requer token
+router.post('/change-password', auth, validate(ChangePasswordSchema), AuthController.changePassword);
 
 // GET /api/auth/me - Obter dados do usuário logado
 router.get('/me', AuthController.me);
